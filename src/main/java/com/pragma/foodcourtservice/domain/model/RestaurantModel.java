@@ -7,10 +7,10 @@ public class RestaurantModel {
     private String address;
     private String phone;
     private String urlLogo;
-    private String ownerId;
+    private Long ownerId;
 
     public RestaurantModel(){}
-    public RestaurantModel(Long id, String name, String nit, String address, String phone, String urlLogo, String ownerId) {
+    public RestaurantModel(Long id, String name, String nit, String address, String phone, String urlLogo, Long ownerId) {
         this.id = id;
         this.name = name;
         this.nit = nit;
@@ -68,11 +68,11 @@ public class RestaurantModel {
         this.urlLogo = urlLogo;
     }
 
-    public String getOwnerId() {
+    public Long getOwnerId() {
         return ownerId;
     }
 
-    public void setOwnerId(String ownerId) {
+    public void setOwnerId(Long ownerId) {
         this.ownerId = ownerId;
     }
 }

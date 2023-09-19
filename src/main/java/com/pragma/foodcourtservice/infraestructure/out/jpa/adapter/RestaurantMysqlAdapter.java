@@ -17,4 +17,19 @@ public class RestaurantMysqlAdapter implements IRestaurantPersistencePort {
     public void save(RestaurantModel restaurantModel) {
         restaurantRepository.save(restaurantEntityMapper.mapToRestaurantEntity(restaurantModel));
     }
+
+    @Override
+    public boolean existsByName(String name) {
+        return restaurantRepository.existsByName(name);
+    }
+
+    @Override
+    public boolean existsByNit(String nit) {
+        return restaurantRepository.existsByNit(nit);
+    }
+
+    @Override
+    public RestaurantModel findByOwnerId(Long ownerId) {
+        return restaurantEntityMapper.mapToRestaurantModel(restaurantRepository.findByOwnerId(ownerId).orElse(null));
+    }
 }

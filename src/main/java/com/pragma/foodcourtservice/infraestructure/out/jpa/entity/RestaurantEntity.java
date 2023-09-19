@@ -17,7 +17,7 @@ public class RestaurantEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String name;
     @Column(nullable = false, unique = true)
     private String nit;
@@ -28,6 +28,6 @@ public class RestaurantEntity {
     @Column(name = "url_logo", nullable = false)
     private String urlLogo;
     @Column(name = "owner_id", nullable = false, unique = true)
-    private String ownerId;
+    private Long ownerId;
 
 }
