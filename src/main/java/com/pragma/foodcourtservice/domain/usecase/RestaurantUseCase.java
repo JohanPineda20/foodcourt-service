@@ -43,6 +43,5 @@ public class RestaurantUseCase implements IRestaurantServicePort {
         if(restaurantModel1 != null) throw new DomainException("Owner must have only one restaurant");
 
         restaurantPersistencePort.save(restaurantModel);
-
     }
 }
