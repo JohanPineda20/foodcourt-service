@@ -1,6 +1,7 @@
 package com.pragma.foodcourtservice.infraestructure.input.rest;
 
 import com.pragma.foodcourtservice.application.dto.request.DishRequest;
+import com.pragma.foodcourtservice.application.dto.request.UpdateDishRequest;
 import com.pragma.foodcourtservice.application.handler.IDishHandler;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -12,10 +13,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "Dish Controller")
 @RestController
@@ -35,6 +33,12 @@ public class DishController {
     public ResponseEntity<Void> save(@Valid @RequestBody DishRequest dishRequest){
         dishHandler.save(dishRequest);
         return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<Void> update(@PathVariable Long id, @Valid @RequestBody UpdateDishRequest updateDishRequest){
+        dishHandler.update(id, updateDishRequest);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
 }

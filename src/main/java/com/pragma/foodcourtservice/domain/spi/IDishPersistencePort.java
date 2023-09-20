@@ -5,4 +5,6 @@ import com.pragma.foodcourtservice.domain.model.DishModel;
 public interface IDishPersistencePort {
     boolean existsByNameAndRestaurantId(String name, Long restaurantId);
     void save(DishModel dishModel);
+
+    DishModel findById(Long id);
 }

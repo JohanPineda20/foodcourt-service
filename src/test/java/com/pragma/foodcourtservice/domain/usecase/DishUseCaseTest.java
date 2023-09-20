@@ -2,6 +2,7 @@ package com.pragma.foodcourtservice.domain.usecase;
 
 import com.pragma.foodcourtservice.domain.exception.DataAlreadyExistsException;
 import com.pragma.foodcourtservice.domain.exception.DataNotFoundException;
+import com.pragma.foodcourtservice.domain.exception.DomainException;
 import com.pragma.foodcourtservice.domain.model.CategoryModel;
 import com.pragma.foodcourtservice.domain.model.DishModel;
 import com.pragma.foodcourtservice.domain.model.RestaurantModel;
@@ -13,6 +14,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.math.BigDecimal;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -85,6 +88,42 @@ class DishUseCaseTest {
         assertNull(dishModel.getActive());
         assertEquals(1L, dishModel.getCategory().getId());
         assertEquals(1L, dishModel.getRestaurant().getId());
+    }
+    @Test
+    void update() {
+        DishModel dishModel = createExampleDish();
+        Long id =  1L;
+        DishModel updateDish = new DishModel();
+        updateDish.setPrice(BigDecimal.valueOf(0.5));
+        updateDish.setDescription("delicious");
+        when(dishPersistencePort.findById(id)).thenReturn(dishModel);
+
+        dishUseCase.update(id, updateDish);
+
+        verify(dishPersistencePort, times(1)).save(dishModel);
+        assertEquals(updateDish.getPrice(), dishModel.getPrice());
+        assertEquals(updateDish.getDescription(), dishModel.getDescription());
+    }
+    @Test
+    void updateDishNotFound() {
+        Long id =  1L;
+        DishModel updateDish = new DishModel();
+        updateDish.setPrice(BigDecimal.valueOf(0.5));
+        updateDish.setDescription("delicious");
+        when(dishPersistencePort.findById(id)).thenReturn(null);
+
+        assertThrows(DataNotFoundException.class, () -> dishUseCase.update(id, updateDish));
+        verify(dishPersistencePort, never()).save(any());
+    }
+    @Test
+    void updatePriceAndDescriptionAreNull() {
+        DishModel dishModel = createExampleDish();
+        Long id =  1L;
+        DishModel updateDish = new DishModel();
+        when(dishPersistencePort.findById(id)).thenReturn(dishModel);
+
+        assertThrows(DomainException.class, () -> dishUseCase.update(id, updateDish));
+        verify(dishPersistencePort, never()).save(dishModel);
     }
 
     private DishModel createExampleDish(){

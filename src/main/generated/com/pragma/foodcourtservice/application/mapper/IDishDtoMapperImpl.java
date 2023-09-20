@@ -1,6 +1,7 @@
 package com.pragma.foodcourtservice.application.mapper;
 
 import com.pragma.foodcourtservice.application.dto.request.DishRequest;
+import com.pragma.foodcourtservice.application.dto.request.UpdateDishRequest;
 import com.pragma.foodcourtservice.domain.model.CategoryModel;
 import com.pragma.foodcourtservice.domain.model.DishModel;
 import com.pragma.foodcourtservice.domain.model.RestaurantModel;
@@ -9,7 +10,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2023-09-20T12:28:03-0500",
+    date = "2023-09-20T17:59:33-0500",
     comments = "version: 1.5.5.Final, compiler: javac, environment: Java 17.0.8.1 (Amazon.com Inc.)"
 )
 @Component
@@ -29,6 +30,20 @@ public class IDishDtoMapperImpl implements IDishDtoMapper {
         dishModel.setDescription( dishRequest.getDescription() );
         dishModel.setPrice( dishRequest.getPrice() );
         dishModel.setUrlImage( dishRequest.getUrlImage() );
+
+        return dishModel;
+    }
+
+    @Override
+    public DishModel mapToDishModelFromUpdateDishRequest(UpdateDishRequest updateDishRequest) {
+        if ( updateDishRequest == null ) {
+            return null;
+        }
+
+        DishModel dishModel = new DishModel();
+
+        dishModel.setDescription( updateDishRequest.getDescription() );
+        dishModel.setPrice( updateDishRequest.getPrice() );
 
         return dishModel;
     }

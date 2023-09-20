@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2023-09-20T12:28:03-0500",
+    date = "2023-09-20T17:59:33-0500",
     comments = "version: 1.5.5.Final, compiler: javac, environment: Java 17.0.8.1 (Amazon.com Inc.)"
 )
 @Component
@@ -35,6 +35,26 @@ public class IDishEntityMapperImpl implements IDishEntityMapper {
         dishEntity.setCategory( categoryModelToCategoryEntity( dishModel.getCategory() ) );
 
         return dishEntity;
+    }
+
+    @Override
+    public DishModel mapToDishModel(DishEntity dishEntity) {
+        if ( dishEntity == null ) {
+            return null;
+        }
+
+        DishModel dishModel = new DishModel();
+
+        dishModel.setId( dishEntity.getId() );
+        dishModel.setName( dishEntity.getName() );
+        dishModel.setDescription( dishEntity.getDescription() );
+        dishModel.setPrice( dishEntity.getPrice() );
+        dishModel.setUrlImage( dishEntity.getUrlImage() );
+        dishModel.setActive( dishEntity.getActive() );
+        dishModel.setRestaurant( restaurantEntityToRestaurantModel( dishEntity.getRestaurant() ) );
+        dishModel.setCategory( categoryEntityToCategoryModel( dishEntity.getCategory() ) );
+
+        return dishModel;
     }
 
     protected RestaurantEntity restaurantModelToRestaurantEntity(RestaurantModel restaurantModel) {
@@ -67,5 +87,37 @@ public class IDishEntityMapperImpl implements IDishEntityMapper {
         categoryEntity.setDescription( categoryModel.getDescription() );
 
         return categoryEntity;
+    }
+
+    protected RestaurantModel restaurantEntityToRestaurantModel(RestaurantEntity restaurantEntity) {
+        if ( restaurantEntity == null ) {
+            return null;
+        }
+
+        RestaurantModel restaurantModel = new RestaurantModel();
+
+        restaurantModel.setId( restaurantEntity.getId() );
+        restaurantModel.setName( restaurantEntity.getName() );
+        restaurantModel.setNit( restaurantEntity.getNit() );
+        restaurantModel.setAddress( restaurantEntity.getAddress() );
+        restaurantModel.setPhone( restaurantEntity.getPhone() );
+        restaurantModel.setUrlLogo( restaurantEntity.getUrlLogo() );
+        restaurantModel.setOwnerId( restaurantEntity.getOwnerId() );
+
+        return restaurantModel;
+    }
+
+    protected CategoryModel categoryEntityToCategoryModel(CategoryEntity categoryEntity) {
+        if ( categoryEntity == null ) {
+            return null;
+        }
+
+        CategoryModel categoryModel = new CategoryModel();
+
+        categoryModel.setId( categoryEntity.getId() );
+        categoryModel.setName( categoryEntity.getName() );
+        categoryModel.setDescription( categoryEntity.getDescription() );
+
+        return categoryModel;
     }
 }

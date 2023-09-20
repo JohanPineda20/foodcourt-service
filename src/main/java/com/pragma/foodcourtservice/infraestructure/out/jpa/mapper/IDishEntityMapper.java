@@ -12,4 +12,6 @@ public interface IDishEntityMapper {
 
     DishEntity mapToDishEntity(DishModel dishModel);
 
+    DishModel mapToDishModel(DishEntity dishEntity);
+
 }
