@@ -27,4 +27,8 @@ public class CategoryMysqlAdapter implements ICategoryPersistencePort {
     public List<CategoryModel> getAllCategories() {
         return categoryEntityMapper.mapToCategoryModelList(categoryRepository.findAll());
     }
+    @Override
+    public CategoryModel findById(Long id) {
+        return categoryEntityMapper.mapToCategoryModel(categoryRepository.findById(id).orElse(null));
+    }
 }
