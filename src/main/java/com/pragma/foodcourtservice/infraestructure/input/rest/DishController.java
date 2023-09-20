@@ -1,7 +1,7 @@
 package com.pragma.foodcourtservice.infraestructure.input.rest;
 
 import com.pragma.foodcourtservice.application.dto.request.DishRequest;
-import com.pragma.foodcourtservice.application.handler.impl.IDishHandler;
+import com.pragma.foodcourtservice.application.handler.IDishHandler;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

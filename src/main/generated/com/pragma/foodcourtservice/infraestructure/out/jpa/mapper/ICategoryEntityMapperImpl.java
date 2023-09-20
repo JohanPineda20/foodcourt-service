@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2023-09-19T21:26:13-0500",
+    date = "2023-09-20T11:25:47-0500",
     comments = "version: 1.5.5.Final, compiler: javac, environment: Java 17.0.8.1 (Amazon.com Inc.)"
 )
 @Component
@@ -31,20 +31,7 @@ public class ICategoryEntityMapperImpl implements ICategoryEntityMapper {
     }
 
     @Override
-    public List<CategoryModel> mapToCategoryModelList(List<CategoryEntity> categoryEntityList) {
-        if ( categoryEntityList == null ) {
-            return null;
-        }
-
-        List<CategoryModel> list = new ArrayList<CategoryModel>( categoryEntityList.size() );
-        for ( CategoryEntity categoryEntity : categoryEntityList ) {
-            list.add( categoryEntityToCategoryModel( categoryEntity ) );
-        }
-
-        return list;
-    }
-
-    protected CategoryModel categoryEntityToCategoryModel(CategoryEntity categoryEntity) {
+    public CategoryModel mapToCategoryModel(CategoryEntity categoryEntity) {
         if ( categoryEntity == null ) {
             return null;
         }
@@ -56,5 +43,19 @@ public class ICategoryEntityMapperImpl implements ICategoryEntityMapper {
         categoryModel.setDescription( categoryEntity.getDescription() );
 
         return categoryModel;
+    }
+
+    @Override
+    public List<CategoryModel> mapToCategoryModelList(List<CategoryEntity> categoryEntityList) {
+        if ( categoryEntityList == null ) {
+            return null;
+        }
+
+        List<CategoryModel> list = new ArrayList<CategoryModel>( categoryEntityList.size() );
+        for ( CategoryEntity categoryEntity : categoryEntityList ) {
+            list.add( mapToCategoryModel( categoryEntity ) );
+        }
+
+        return list;
     }
 }
