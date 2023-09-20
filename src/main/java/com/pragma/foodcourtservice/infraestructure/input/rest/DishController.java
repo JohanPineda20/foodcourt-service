@@ -2,6 +2,12 @@ package com.pragma.foodcourtservice.infraestructure.input.rest;
 
 import com.pragma.foodcourtservice.application.dto.request.DishRequest;
 import com.pragma.foodcourtservice.application.handler.IDishHandler;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -11,13 +17,20 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+@Tag(name = "Dish Controller")
 @RestController
 @RequestMapping("/dish")
 @RequiredArgsConstructor
 public class DishController {
 
     private final IDishHandler dishHandler;
-
+    @Operation(summary = "Add a new dish")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Dish created", content = @Content),
+            @ApiResponse(responseCode = "400", description = "Bad request: wrong input data", content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Exception"))),
+            @ApiResponse(responseCode = "404", description = "Category or Restaurant not found", content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Exception"))),
+            @ApiResponse(responseCode = "409", description = "Conflict: Dish already exists", content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Exception")))
+    })
     @PostMapping
     public ResponseEntity<Void> save(@Valid @RequestBody DishRequest dishRequest){
         dishHandler.save(dishRequest);

@@ -32,6 +32,6 @@ public class RestaurantRequest {
 
     @NotNull(message = "owner_id is required")
     @Min(value = 1, message = "The owner_id must be a positive number")
-    private String ownerId;
+    private Long ownerId;
 
 }

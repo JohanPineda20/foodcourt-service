@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2023-09-19T20:41:51-0500",
+    date = "2023-09-20T12:28:03-0500",
     comments = "version: 1.5.5.Final, compiler: javac, environment: Java 17.0.8.1 (Amazon.com Inc.)"
 )
 @Component
@@ -26,9 +26,7 @@ public class IRestaurantDtoMapperImpl implements IRestaurantDtoMapper {
         restaurantModel.setAddress( restaurantRequest.getAddress() );
         restaurantModel.setPhone( restaurantRequest.getPhone() );
         restaurantModel.setUrlLogo( restaurantRequest.getUrlLogo() );
-        if ( restaurantRequest.getOwnerId() != null ) {
-            restaurantModel.setOwnerId( Long.parseLong( restaurantRequest.getOwnerId() ) );
-        }
+        restaurantModel.setOwnerId( restaurantRequest.getOwnerId() );
 
         return restaurantModel;
     }
