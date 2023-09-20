@@ -4,5 +4,5 @@ import com.pragma.foodcourtservice.infraestructure.out.jpa.entity.DishEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface IDishRepository extends JpaRepository<DishEntity,Long> {
-    boolean existsByName(String name);
+    boolean existsByNameAndRestaurantId(String name, Long restaurantId);
 }

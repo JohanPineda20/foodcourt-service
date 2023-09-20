@@ -22,13 +22,15 @@ public class DishUseCase implements IDishServicePort {
     }
     @Override
     public void save(DishModel dishModel) {
-        if(dishPersistencePort.existsByName(dishModel.getName())) {
-            throw new DataAlreadyExistsException("Dish with name " + dishModel.getName() + " already exists");
-        }
         CategoryModel categoryModel = categoryPersistencePort.findById(dishModel.getCategory().getId());
         if(categoryModel == null) throw new DataNotFoundException("Category not found");
         RestaurantModel restaurantModel = restaurantPersistencePort.findById(dishModel.getRestaurant().getId());
         if(restaurantModel == null) throw new DataNotFoundException("Restaurant not found");
+
+
+        if(dishPersistencePort.existsByNameAndRestaurantId(dishModel.getName(), restaurantModel.getId())) {
+            throw new DataAlreadyExistsException("Dish with name " + dishModel.getName() + " already exists");
+        }
 
         dishModel.setCategory(categoryModel);
         dishModel.setRestaurant(restaurantModel);

@@ -12,8 +12,8 @@ public class DishMysqlAdapter implements IDishPersistencePort {
     private final IDishRepository dishRepository;
     private final IDishEntityMapper dishEntityMapper;
     @Override
-    public boolean existsByName(String name) {
-        return dishRepository.existsByName(name);
+    public boolean existsByNameAndRestaurantId(String name, Long restaurantId) {
+        return dishRepository.existsByNameAndRestaurantId(name, restaurantId);
     }
     @Override
     public void save(DishModel dishModel) {

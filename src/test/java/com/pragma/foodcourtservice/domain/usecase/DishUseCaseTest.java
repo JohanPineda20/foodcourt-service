@@ -48,7 +48,11 @@ class DishUseCaseTest {
     @Test
     void saveDishAlreadyExists() {
         DishModel dishModel = createExampleDish();
-        when(dishPersistencePort.existsByName(dishModel.getName())).thenReturn(true);
+        CategoryModel categoryModel = createExampleCategory();
+        RestaurantModel restaurantModel = createExampleRestaurant();
+        when(categoryPersistencePort.findById(dishModel.getCategory().getId())).thenReturn(categoryModel);
+        when(restaurantPersistencePort.findById(dishModel.getRestaurant().getId())).thenReturn(restaurantModel);
+        when(dishPersistencePort.existsByNameAndRestaurantId(dishModel.getName(), restaurantModel.getId())).thenReturn(true);
 
         assertThrows(DataAlreadyExistsException.class, () -> dishUseCase.save(dishModel));
         verify(dishPersistencePort, never()).save(dishModel);
