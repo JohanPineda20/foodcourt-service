@@ -11,4 +11,6 @@ public interface IRestaurantPersistencePort {
     boolean existsByNit(String nit);
 
     RestaurantModel findByOwnerId(Long ownerId);
+
+    RestaurantModel findById(Long id);
 }

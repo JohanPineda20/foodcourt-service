@@ -32,4 +32,9 @@ public class RestaurantMysqlAdapter implements IRestaurantPersistencePort {
     public RestaurantModel findByOwnerId(Long ownerId) {
         return restaurantEntityMapper.mapToRestaurantModel(restaurantRepository.findByOwnerId(ownerId).orElse(null));
     }
+
+    @Override
+    public RestaurantModel findById(Long id) {
+        return restaurantEntityMapper.mapToRestaurantModel(restaurantRepository.findById(id).orElse(null));
+    }
 }

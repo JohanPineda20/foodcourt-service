@@ -56,8 +56,8 @@ public class BeanConfiguration {
         return new CategoryUseCase(categoryPersistencePort);
     }
     @Bean
-    public IDishServicePort dishServicePort(IDishPersistencePort dishPersistencePort, ICategoryPersistencePort categoryPersistencePort){
-        return new DishUseCase(dishPersistencePort, categoryPersistencePort);
+    public IDishServicePort dishServicePort(IDishPersistencePort dishPersistencePort, ICategoryPersistencePort categoryPersistencePort, IRestaurantPersistencePort restaurantPersistencePort){
+        return new DishUseCase(dishPersistencePort, categoryPersistencePort, restaurantPersistencePort);
     }
 
 }

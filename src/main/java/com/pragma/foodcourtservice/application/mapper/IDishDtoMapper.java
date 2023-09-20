@@ -12,6 +12,7 @@ import org.mapstruct.ReportingPolicy;
 public interface IDishDtoMapper {
 
     @Mapping(target = "category.id", source = "categoryId")
+    @Mapping(target = "restaurant.id", source = "restaurantId")
     DishModel mapToDishModel(DishRequest dishRequest);
 
 }

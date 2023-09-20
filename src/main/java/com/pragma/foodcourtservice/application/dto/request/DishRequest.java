@@ -22,7 +22,10 @@ public class DishRequest {
     private String description;
     private String urlImage;
     @NotNull(message = "Category_id is required")
-    @DecimalMin(value = "1", message = "Category_id must be a positive number")
+    @Min(value = 1, message = "Category_id must be a positive number")
     private Long categoryId;
+    @NotNull(message = "Category_id is required")
+    @Min(value = 1, message = "Category_id must be a positive number")
+    private Long restaurantId;
 
 }
