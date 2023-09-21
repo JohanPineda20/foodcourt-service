@@ -34,7 +34,13 @@ public class DishController {
         dishHandler.save(dishRequest);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
-
+    @Operation(summary = "Update a dish")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Dish update", content = @Content),
+            @ApiResponse(responseCode = "400", description = "Bad request: wrong input data", content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Exception"))),
+            @ApiResponse(responseCode = "404", description = "Dish not found", content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Exception"))),
+            @ApiResponse(responseCode = "409", description = "Conflict: Price or Description is required", content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Exception")))
+    })
     @PatchMapping("/{id}")
     public ResponseEntity<Void> update(@PathVariable Long id, @Valid @RequestBody UpdateDishRequest updateDishRequest){
         dishHandler.update(id, updateDishRequest);
