@@ -3,10 +3,7 @@ package com.pragma.foodcourtservice.infraestructure.configuration;
 import com.pragma.foodcourtservice.domain.api.ICategoryServicePort;
 import com.pragma.foodcourtservice.domain.api.IDishServicePort;
 import com.pragma.foodcourtservice.domain.api.IRestaurantServicePort;
-import com.pragma.foodcourtservice.domain.spi.ICategoryPersistencePort;
-import com.pragma.foodcourtservice.domain.spi.IDishPersistencePort;
-import com.pragma.foodcourtservice.domain.spi.IRestaurantPersistencePort;
-import com.pragma.foodcourtservice.domain.spi.IUserFeignClientPort;
+import com.pragma.foodcourtservice.domain.spi.*;
 import com.pragma.foodcourtservice.domain.usecase.CategoryUseCase;
 import com.pragma.foodcourtservice.domain.usecase.DishUseCase;
 import com.pragma.foodcourtservice.domain.usecase.RestaurantUseCase;
@@ -22,6 +19,7 @@ import com.pragma.foodcourtservice.infraestructure.out.jpa.mapper.IRestaurantEnt
 import com.pragma.foodcourtservice.infraestructure.out.jpa.repository.ICategoryRepository;
 import com.pragma.foodcourtservice.infraestructure.out.jpa.repository.IDishRepository;
 import com.pragma.foodcourtservice.infraestructure.out.jpa.repository.IRestaurantRepository;
+import com.pragma.foodcourtservice.infraestructure.out.securitycontext.SecurityContextAdapter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -29,9 +27,14 @@ import org.springframework.context.annotation.Configuration;
 public class BeanConfiguration {
 
     @Bean
+    public ISecurityContextPort securityContextPort(){
+        return new SecurityContextAdapter();
+    }
+    @Bean
     public IUserFeignClientPort userFeignClientPort(IUserFeignClient userFeignClient, IUserFeignDtoMapper userFeignDtoMapper){
         return new UserFeignClientAdapter(userFeignClient, userFeignDtoMapper);
     }
+
 
     @Bean
     public IDishPersistencePort dishPersistencePort(IDishRepository dishRepository, IDishEntityMapper dishEntityMapper){
@@ -56,8 +59,8 @@ public class BeanConfiguration {
         return new CategoryUseCase(categoryPersistencePort);
     }
     @Bean
-    public IDishServicePort dishServicePort(IDishPersistencePort dishPersistencePort, ICategoryPersistencePort categoryPersistencePort, IRestaurantPersistencePort restaurantPersistencePort){
-        return new DishUseCase(dishPersistencePort, categoryPersistencePort, restaurantPersistencePort);
+    public IDishServicePort dishServicePort(IDishPersistencePort dishPersistencePort, ICategoryPersistencePort categoryPersistencePort, IRestaurantPersistencePort restaurantPersistencePort, ISecurityContextPort securityContextPort){
+        return new DishUseCase(dishPersistencePort, categoryPersistencePort, restaurantPersistencePort, securityContextPort);
     }
 
 }

@@ -1,2 +1,5 @@
-package com.pragma.foodcourtservice.domain.spi;public interface ISecurityContextPort {
+package com.pragma.foodcourtservice.domain.spi;
+
+public interface ISecurityContextPort {
+    Long getIdFromSecurityContext();
 }
