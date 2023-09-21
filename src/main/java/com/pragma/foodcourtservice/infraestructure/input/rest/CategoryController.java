@@ -14,6 +14,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -33,6 +34,7 @@ public class CategoryController {
             @ApiResponse(responseCode = "409", description = "Conflict: Category already exists", content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Exception")))
     })
     @PostMapping
+    @PreAuthorize("hasAnyAuthority({'ADMIN','OWNER'})")
     public ResponseEntity<Void> save(@Valid @RequestBody CategoryRequest categoryRequest){
         categoryHandler.save(categoryRequest);
         return ResponseEntity.status(HttpStatus.CREATED).build();
@@ -43,9 +45,8 @@ public class CategoryController {
             @ApiResponse(responseCode = "404", description = "There aren't categories", content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Exception"))),
     })
     @GetMapping
+    @PreAuthorize("hasAnyAuthority({'ADMIN','OWNER'})")
     public ResponseEntity<List<CategoryResponse>> getAllCategories(){
         return ResponseEntity.ok(categoryHandler.getAllCategories());
     }
-
-
 }

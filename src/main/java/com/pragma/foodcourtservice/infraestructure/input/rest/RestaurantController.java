@@ -12,6 +12,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -33,6 +34,7 @@ public class RestaurantController {
             @ApiResponse(responseCode = "409", description = "Conflict: Restaurant already exists, exception from feign request, user must be an owner, owner must have only one restaurant", content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Exception")))
     })
     @PostMapping
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<Void> save(@Valid @RequestBody RestaurantRequest restaurantRequest){
         restaurantHandler.save(restaurantRequest);
         return new ResponseEntity<>(HttpStatus.CREATED);

@@ -13,6 +13,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "Dish Controller")
@@ -30,6 +31,7 @@ public class DishController {
             @ApiResponse(responseCode = "409", description = "Conflict: Dish already exists", content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Exception")))
     })
     @PostMapping
+    @PreAuthorize("hasAuthority('OWNER')")
     public ResponseEntity<Void> save(@Valid @RequestBody DishRequest dishRequest){
         dishHandler.save(dishRequest);
         return ResponseEntity.status(HttpStatus.CREATED).build();
@@ -42,6 +44,7 @@ public class DishController {
             @ApiResponse(responseCode = "409", description = "Conflict: Price or Description is required", content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Exception")))
     })
     @PatchMapping("/{id}")
+    @PreAuthorize("hasAuthority('OWNER')")
     public ResponseEntity<Void> update(@PathVariable Long id, @Valid @RequestBody UpdateDishRequest updateDishRequest){
         dishHandler.update(id, updateDishRequest);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
