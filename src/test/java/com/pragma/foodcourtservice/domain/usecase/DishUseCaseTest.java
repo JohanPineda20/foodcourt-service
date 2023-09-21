@@ -9,6 +9,7 @@ import com.pragma.foodcourtservice.domain.model.RestaurantModel;
 import com.pragma.foodcourtservice.domain.spi.ICategoryPersistencePort;
 import com.pragma.foodcourtservice.domain.spi.IDishPersistencePort;
 import com.pragma.foodcourtservice.domain.spi.IRestaurantPersistencePort;
+import com.pragma.foodcourtservice.domain.spi.ISecurityContextPort;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -32,6 +33,8 @@ class DishUseCaseTest {
     IRestaurantPersistencePort restaurantPersistencePort;
     @Mock
     IDishPersistencePort dishPersistencePort;
+    @Mock
+    ISecurityContextPort securityContextPort;
 
     @Test
     void save() {
@@ -40,6 +43,7 @@ class DishUseCaseTest {
         RestaurantModel restaurantModel = createExampleRestaurant();
         when(categoryPersistencePort.findById(dishModel.getCategory().getId())).thenReturn(categoryModel);
         when(restaurantPersistencePort.findById(dishModel.getRestaurant().getId())).thenReturn(restaurantModel);
+        when(securityContextPort.getIdFromSecurityContext()).thenReturn(1L);
 
         dishUseCase.save(dishModel);
 
@@ -48,22 +52,6 @@ class DishUseCaseTest {
         assertEquals(categoryModel, dishModel.getCategory());
         assertEquals(restaurantModel, dishModel.getRestaurant());
     }
-    @Test
-    void saveDishAlreadyExists() {
-        DishModel dishModel = createExampleDish();
-        CategoryModel categoryModel = createExampleCategory();
-        RestaurantModel restaurantModel = createExampleRestaurant();
-        when(categoryPersistencePort.findById(dishModel.getCategory().getId())).thenReturn(categoryModel);
-        when(restaurantPersistencePort.findById(dishModel.getRestaurant().getId())).thenReturn(restaurantModel);
-        when(dishPersistencePort.existsByNameAndRestaurantId(dishModel.getName(), restaurantModel.getId())).thenReturn(true);
-
-        assertThrows(DataAlreadyExistsException.class, () -> dishUseCase.save(dishModel));
-        verify(dishPersistencePort, never()).save(dishModel);
-        assertNull(dishModel.getActive());
-        assertEquals(1L, dishModel.getCategory().getId());
-        assertEquals(1L, dishModel.getRestaurant().getId());
-    }
-
     @Test
     void saveCategoryNotFound() {
         DishModel dishModel = createExampleDish();
@@ -90,6 +78,41 @@ class DishUseCaseTest {
         assertEquals(1L, dishModel.getRestaurant().getId());
     }
     @Test
+    void saveOwnerIsNotOwnerOfRestaurant() {
+        DishModel dishModel = createExampleDish();
+        CategoryModel categoryModel = createExampleCategory();
+        RestaurantModel restaurantModel = createExampleRestaurant();
+        when(categoryPersistencePort.findById(dishModel.getCategory().getId())).thenReturn(categoryModel);
+        when(restaurantPersistencePort.findById(dishModel.getRestaurant().getId())).thenReturn(restaurantModel);
+        when(securityContextPort.getIdFromSecurityContext()).thenReturn(2L);
+
+
+        assertThrows(DomainException.class, () -> dishUseCase.save(dishModel));
+        assertNotEquals(2L,restaurantModel.getOwnerId());
+        verify(dishPersistencePort, never()).save(dishModel);
+        assertNull(dishModel.getActive());
+        assertEquals(1L, dishModel.getCategory().getId());
+        assertEquals(1L, dishModel.getRestaurant().getId());
+    }
+
+    @Test
+    void saveDishAlreadyExists() {
+        DishModel dishModel = createExampleDish();
+        CategoryModel categoryModel = createExampleCategory();
+        RestaurantModel restaurantModel = createExampleRestaurant();
+        when(categoryPersistencePort.findById(dishModel.getCategory().getId())).thenReturn(categoryModel);
+        when(restaurantPersistencePort.findById(dishModel.getRestaurant().getId())).thenReturn(restaurantModel);
+        when(dishPersistencePort.existsByNameAndRestaurantId(dishModel.getName(), restaurantModel.getId())).thenReturn(true);
+        when(securityContextPort.getIdFromSecurityContext()).thenReturn(1L);
+
+        assertThrows(DataAlreadyExistsException.class, () -> dishUseCase.save(dishModel));
+        verify(dishPersistencePort, never()).save(dishModel);
+        assertNull(dishModel.getActive());
+        assertEquals(1L, dishModel.getCategory().getId());
+        assertEquals(1L, dishModel.getRestaurant().getId());
+    }
+
+    @Test
     void update() {
         DishModel dishModel = createExampleDish();
         Long id =  1L;
@@ -97,6 +120,7 @@ class DishUseCaseTest {
         updateDish.setPrice(BigDecimal.valueOf(0.5));
         updateDish.setDescription("delicious");
         when(dishPersistencePort.findById(id)).thenReturn(dishModel);
+        when(securityContextPort.getIdFromSecurityContext()).thenReturn(1L);
 
         dishUseCase.update(id, updateDish);
 
@@ -121,6 +145,7 @@ class DishUseCaseTest {
         Long id =  1L;
         DishModel updateDish = new DishModel();
         when(dishPersistencePort.findById(id)).thenReturn(dishModel);
+        when(securityContextPort.getIdFromSecurityContext()).thenReturn(1L);
 
         assertThrows(DomainException.class, () -> dishUseCase.update(id, updateDish));
         verify(dishPersistencePort, never()).save(dishModel);
@@ -141,6 +166,7 @@ class DishUseCaseTest {
     private RestaurantModel createExampleRestaurant(){
         RestaurantModel restaurantModel = new RestaurantModel();
         restaurantModel.setId(1L);
+        restaurantModel.setOwnerId(1L);
         return restaurantModel;
     }
 
