@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -27,9 +28,11 @@ public class DishController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Dish created", content = @Content),
             @ApiResponse(responseCode = "400", description = "Bad request: wrong input data", content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Exception"))),
+            @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Exception"))),
             @ApiResponse(responseCode = "404", description = "Category or Restaurant not found", content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Exception"))),
             @ApiResponse(responseCode = "409", description = "Conflict: Dish already exists", content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Exception")))
     })
+    @SecurityRequirement(name = "jwt")
     @PostMapping
     @PreAuthorize("hasAuthority('OWNER')")
     public ResponseEntity<Void> save(@Valid @RequestBody DishRequest dishRequest){
@@ -40,9 +43,11 @@ public class DishController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Dish update", content = @Content),
             @ApiResponse(responseCode = "400", description = "Bad request: wrong input data", content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Exception"))),
+            @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Exception"))),
             @ApiResponse(responseCode = "404", description = "Dish not found", content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Exception"))),
             @ApiResponse(responseCode = "409", description = "Conflict: Price or Description is required", content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Exception")))
     })
+    @SecurityRequirement(name = "jwt")
     @PatchMapping("/{id}")
     @PreAuthorize("hasAuthority('OWNER')")
     public ResponseEntity<Void> update(@PathVariable Long id, @Valid @RequestBody UpdateDishRequest updateDishRequest){

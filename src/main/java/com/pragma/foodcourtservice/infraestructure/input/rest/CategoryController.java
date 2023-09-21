@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -31,8 +32,10 @@ public class CategoryController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Category created", content = @Content),
             @ApiResponse(responseCode = "400", description = "Bad request: wrong input data", content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Exception"))),
+            @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Exception"))),
             @ApiResponse(responseCode = "409", description = "Conflict: Category already exists", content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Exception")))
     })
+    @SecurityRequirement(name = "jwt")
     @PostMapping
     @PreAuthorize("hasAnyAuthority({'ADMIN','OWNER'})")
     public ResponseEntity<Void> save(@Valid @RequestBody CategoryRequest categoryRequest){
@@ -42,8 +45,10 @@ public class CategoryController {
     @Operation(summary = "Get all categories")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Get all categories", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = CategoryRequest.class)))),
-            @ApiResponse(responseCode = "404", description = "There aren't categories", content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Exception"))),
+            @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Exception"))),
+            @ApiResponse(responseCode = "404", description = "There aren't categories", content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Exception")))
     })
+    @SecurityRequirement(name = "jwt")
     @GetMapping
     @PreAuthorize("hasAnyAuthority({'ADMIN','OWNER'})")
     public ResponseEntity<List<CategoryResponse>> getAllCategories(){
