@@ -20,4 +20,9 @@ public class RestaurantHandlerImpl implements IRestaurantHandler {
     public void save(RestaurantRequest restaurantRequest) {
         restaurantServicePort.save(restaurantDtoMapper.mapToRestaurantModel(restaurantRequest));
     }
+
+    @Override
+    public void saveRestaurantEmployee(Long ownerId, Long employeeId) {
+        restaurantServicePort.saveRestaurantEmployee(ownerId, employeeId);
+    }
 }

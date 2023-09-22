@@ -15,9 +15,11 @@ import com.pragma.foodcourtservice.infraestructure.out.jpa.adapter.DishMysqlAdap
 import com.pragma.foodcourtservice.infraestructure.out.jpa.adapter.RestaurantMysqlAdapter;
 import com.pragma.foodcourtservice.infraestructure.out.jpa.mapper.ICategoryEntityMapper;
 import com.pragma.foodcourtservice.infraestructure.out.jpa.mapper.IDishEntityMapper;
+import com.pragma.foodcourtservice.infraestructure.out.jpa.mapper.IRestaurantEmployeeEntityMapper;
 import com.pragma.foodcourtservice.infraestructure.out.jpa.mapper.IRestaurantEntityMapper;
 import com.pragma.foodcourtservice.infraestructure.out.jpa.repository.ICategoryRepository;
 import com.pragma.foodcourtservice.infraestructure.out.jpa.repository.IDishRepository;
+import com.pragma.foodcourtservice.infraestructure.out.jpa.repository.IRestaurantEmployeeRepository;
 import com.pragma.foodcourtservice.infraestructure.out.jpa.repository.IRestaurantRepository;
 import com.pragma.foodcourtservice.infraestructure.out.securitycontext.SecurityContextAdapter;
 import org.springframework.context.annotation.Bean;
@@ -41,8 +43,8 @@ public class BeanConfiguration {
         return new DishMysqlAdapter(dishRepository, dishEntityMapper);
     }
     @Bean
-    public IRestaurantPersistencePort restaurantPersistencePort(IRestaurantRepository restaurantRepository, IRestaurantEntityMapper restaurantEntityMapper){
-        return new RestaurantMysqlAdapter(restaurantRepository,restaurantEntityMapper);
+    public IRestaurantPersistencePort restaurantPersistencePort(IRestaurantRepository restaurantRepository, IRestaurantEntityMapper restaurantEntityMapper, IRestaurantEmployeeRepository restaurantEmployeeRepository, IRestaurantEmployeeEntityMapper restaurantEmployeeEntityMapper){
+        return new RestaurantMysqlAdapter(restaurantRepository,restaurantEntityMapper, restaurantEmployeeRepository, restaurantEmployeeEntityMapper);
     }
     @Bean
     public ICategoryPersistencePort categoryPersistencePort(ICategoryRepository categoryRepository, ICategoryEntityMapper categoryEntityMapper){

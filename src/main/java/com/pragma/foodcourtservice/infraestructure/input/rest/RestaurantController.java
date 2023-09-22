@@ -1,5 +1,6 @@
 package com.pragma.foodcourtservice.infraestructure.input.rest;
 
+import com.pragma.foodcourtservice.application.dto.request.RestaurantEmployeeRequest;
 import com.pragma.foodcourtservice.application.dto.request.RestaurantRequest;
 import com.pragma.foodcourtservice.application.handler.IRestaurantHandler;
 import io.swagger.v3.oas.annotations.Operation;
@@ -42,4 +43,12 @@ public class RestaurantController {
         restaurantHandler.save(restaurantRequest);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
+
+    @PostMapping("/employee")
+    @PreAuthorize("hasAuthority('OWNER')")
+    public ResponseEntity<Void> saveRestaurantEmployee(@Valid @RequestBody RestaurantEmployeeRequest restaurantEmployeeRequest){
+        restaurantHandler.saveRestaurantEmployee(restaurantEmployeeRequest.getOwnerId(), restaurantEmployeeRequest.getEmployeeId());
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
 }

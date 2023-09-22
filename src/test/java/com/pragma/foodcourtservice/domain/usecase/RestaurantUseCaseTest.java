@@ -102,6 +102,37 @@ class RestaurantUseCaseTest {
         verify(restaurantPersistencePort, never()).save(restaurantModel);
     }
 
+    @Test
+    void saveRestaurantEmployee(){
+        Long ownerId = 1L;
+        Long employeeId = 1L;
+        RestaurantModel restaurantModel = createExampleRestaurant();
+        when(restaurantPersistencePort.findByOwnerId(ownerId)).thenReturn(restaurantModel);
+
+        restaurantUseCase.saveRestaurantEmployee(ownerId, employeeId);
+
+        verify(restaurantPersistencePort, times(1)).saveRestaurantEmployee(any());
+    }
+
+    @Test
+    void saveRestaurantEmployeeAlreadyExists(){
+        Long ownerId = 1L;
+        Long employeeId = 1L;
+        when(restaurantPersistencePort.existsRestaurantEmployeeByEmployeeId(employeeId)).thenReturn(true);
+
+        assertThrows(DataAlreadyExistsException.class, () -> restaurantUseCase.saveRestaurantEmployee(ownerId, employeeId));
+        verify(restaurantPersistencePort, never()).saveRestaurantEmployee(any());
+    }
+
+    @Test
+    void saveRestaurantEmployeeRetaurantNotFound(){
+        Long ownerId = 1L;
+        Long employeeId = 1L;
+        when(restaurantPersistencePort.findByOwnerId(ownerId)).thenReturn(null);
+        assertThrows(DataNotFoundException.class, () -> restaurantUseCase.saveRestaurantEmployee(ownerId, employeeId));
+        verify(restaurantPersistencePort, never()).saveRestaurantEmployee(any());
+    }
+
     private RestaurantModel createExampleRestaurant(){
         RestaurantModel restaurantModel = new RestaurantModel();
         restaurantModel.setName("rodizio");

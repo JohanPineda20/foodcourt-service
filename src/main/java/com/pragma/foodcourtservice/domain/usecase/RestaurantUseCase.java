@@ -4,6 +4,7 @@ import com.pragma.foodcourtservice.domain.api.IRestaurantServicePort;
 import com.pragma.foodcourtservice.domain.exception.DataAlreadyExistsException;
 import com.pragma.foodcourtservice.domain.exception.DataNotFoundException;
 import com.pragma.foodcourtservice.domain.exception.DomainException;
+import com.pragma.foodcourtservice.domain.model.RestaurantEmployeeModel;
 import com.pragma.foodcourtservice.domain.model.RestaurantModel;
 import com.pragma.foodcourtservice.domain.model.UserModel;
 import com.pragma.foodcourtservice.domain.spi.IRestaurantPersistencePort;
@@ -43,5 +44,19 @@ public class RestaurantUseCase implements IRestaurantServicePort {
         if(restaurantModel1 != null) throw new DomainException("Owner must have only one restaurant");
 
         restaurantPersistencePort.save(restaurantModel);
+    }
+
+    @Override
+    public void saveRestaurantEmployee(Long ownerId, Long employeeId) {
+        if(restaurantPersistencePort.existsRestaurantEmployeeByEmployeeId(employeeId)){
+            throw new DataAlreadyExistsException("User is already an employee");
+        }
+
+        RestaurantModel restaurantModel = restaurantPersistencePort.findByOwnerId(ownerId);
+        if(restaurantModel==null) throw new DataNotFoundException("Owner do not have a restaurant yet");
+        RestaurantEmployeeModel restaurantEmployeeModel = new RestaurantEmployeeModel();
+        restaurantEmployeeModel.setEmployeeId(employeeId);
+        restaurantEmployeeModel.setRestaurant(restaurantModel);
+        restaurantPersistencePort.saveRestaurantEmployee(restaurantEmployeeModel);
     }
 }
