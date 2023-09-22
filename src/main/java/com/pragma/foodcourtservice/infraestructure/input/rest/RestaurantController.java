@@ -44,6 +44,15 @@ public class RestaurantController {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
+    @Operation(summary = "Add a new Employee of a restaurant")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "RestaurantEmployee created", content = @Content),
+            @ApiResponse(responseCode = "400", description = "Bad request: wrong input data", content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Exception"))),
+            @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Exception"))),
+            @ApiResponse(responseCode = "404", description = "Owner cannot create an employee because does not have a restaurant", content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Exception"))),
+            @ApiResponse(responseCode = "409", description = "Conflict: Employee already exists", content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Exception")))
+    })
+    @SecurityRequirement(name = "jwt")
     @PostMapping("/employee")
     @PreAuthorize("hasAuthority('OWNER')")
     public ResponseEntity<Void> saveRestaurantEmployee(@Valid @RequestBody RestaurantEmployeeRequest restaurantEmployeeRequest){

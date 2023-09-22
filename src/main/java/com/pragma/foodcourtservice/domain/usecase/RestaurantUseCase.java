@@ -49,11 +49,11 @@ public class RestaurantUseCase implements IRestaurantServicePort {
     @Override
     public void saveRestaurantEmployee(Long ownerId, Long employeeId) {
         if(restaurantPersistencePort.existsRestaurantEmployeeByEmployeeId(employeeId)){
-            throw new DataAlreadyExistsException("User is already an employee");
+            throw new DataAlreadyExistsException("Employee already exists");
         }
 
         RestaurantModel restaurantModel = restaurantPersistencePort.findByOwnerId(ownerId);
-        if(restaurantModel==null) throw new DataNotFoundException("Owner do not have a restaurant yet");
+        if(restaurantModel==null) throw new DataNotFoundException("Owner does not have a restaurant yet");
         RestaurantEmployeeModel restaurantEmployeeModel = new RestaurantEmployeeModel();
         restaurantEmployeeModel.setEmployeeId(employeeId);
         restaurantEmployeeModel.setRestaurant(restaurantModel);
