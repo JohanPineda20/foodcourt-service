@@ -56,6 +56,17 @@ public class DishUseCase implements IDishServicePort {
         dishPersistencePort.save(dishModel1);
     }
 
+    @Override
+    public void enableDisable(Long id) {
+        DishModel dishModel = dishPersistencePort.findById(id);
+        if(dishModel == null) throw new DataNotFoundException("Dish not found");
+
+        validateOwnerRestaurant(dishModel.getRestaurant().getOwnerId());
+
+        dishModel.setActive(!dishModel.getActive());
+        dishPersistencePort.save(dishModel);
+    }
+
     private void validateOwnerRestaurant(Long ownerIdRestaurant){
        Long ownerIdAuthenticated = securityContextPort.getIdFromSecurityContext();
        if(ownerIdAuthenticated != ownerIdRestaurant) throw new DomainException("Owner authenticated must be owner of the restaurant");

@@ -6,4 +6,6 @@ public interface IDishServicePort {
     void save(DishModel dishModel);
 
     void update(Long id, DishModel dishModel);
+
+    void enableDisable(Long id);
 }

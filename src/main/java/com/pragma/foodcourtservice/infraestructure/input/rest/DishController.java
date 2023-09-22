@@ -41,11 +41,11 @@ public class DishController {
     }
     @Operation(summary = "Update a dish")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "Dish update", content = @Content),
+            @ApiResponse(responseCode = "204", description = "Dish updated", content = @Content),
             @ApiResponse(responseCode = "400", description = "Bad request: wrong input data", content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Exception"))),
             @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Exception"))),
             @ApiResponse(responseCode = "404", description = "Dish not found", content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Exception"))),
-            @ApiResponse(responseCode = "409", description = "Conflict: Price or Description is required", content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Exception")))
+            @ApiResponse(responseCode = "409", description = "Conflict: Price or Description is required, owner authenticated must be owner of the restaurant", content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Exception")))
     })
     @SecurityRequirement(name = "jwt")
     @PatchMapping("/{id}")
@@ -54,5 +54,19 @@ public class DishController {
         dishHandler.update(id, updateDishRequest);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
+    @Operation(summary = "Enable or disable a dish")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Dish updated", content = @Content),
+            @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Exception"))),
+            @ApiResponse(responseCode = "404", description = "Dish not found", content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Exception"))),
+            @ApiResponse(responseCode = "409", description = "Conflict: Owner authenticated must be owner of the restaurant", content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Exception")))
+    })
+    @PatchMapping("/{id}/enable")
+    @PreAuthorize("hasAuthority('OWNER')")
+    public ResponseEntity<Void> enableDisable(@PathVariable Long id){
+        dishHandler.enableDisable(id);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
 
 }

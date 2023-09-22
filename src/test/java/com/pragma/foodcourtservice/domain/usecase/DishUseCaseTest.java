@@ -150,6 +150,41 @@ class DishUseCaseTest {
         assertThrows(DomainException.class, () -> dishUseCase.update(id, updateDish));
         verify(dishPersistencePort, never()).save(dishModel);
     }
+    @Test
+    void enableDisable(){
+        DishModel dishModel = createExampleDish();
+        dishModel.setActive(true);
+        Long id =  1L;
+        when(dishPersistencePort.findById(id)).thenReturn(dishModel);
+        when(securityContextPort.getIdFromSecurityContext()).thenReturn(1L);
+
+        dishUseCase.enableDisable(id);
+
+        verify(dishPersistencePort, times(1)).save(dishModel);
+        assertFalse(dishModel.getActive());
+    }
+    @Test
+    void enableDisableDishNotFound(){
+        Long id =  1L;
+        when(dishPersistencePort.findById(id)).thenReturn(null);
+
+        assertThrows(DataNotFoundException.class, () -> dishUseCase.enableDisable(id));
+        verify(dishPersistencePort, never()).save(any());
+        verify(securityContextPort, never()).getIdFromSecurityContext();
+    }
+    @Test
+    void enableDisableOwnerIsNotOwnerOfRestaurant(){
+        DishModel dishModel = createExampleDish();
+        dishModel.setActive(true);
+        Long id =  1L;
+        when(dishPersistencePort.findById(id)).thenReturn(dishModel);
+        when(securityContextPort.getIdFromSecurityContext()).thenReturn(3L);
+
+        assertThrows(DomainException.class, () -> dishUseCase.enableDisable(id));
+        verify(securityContextPort, times(1)).getIdFromSecurityContext();
+        verify(dishPersistencePort, never()).save(dishModel);
+        assertTrue(dishModel.getActive());
+    }
 
     private DishModel createExampleDish(){
         DishModel dishModel = new DishModel();

@@ -7,4 +7,6 @@ public interface IDishHandler {
     void save(DishRequest dishRequest);
 
     void update(Long id, UpdateDishRequest updateDishRequest);
+
+    void enableDisable(Long id);
 }
