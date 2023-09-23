@@ -11,6 +11,8 @@ import com.pragma.foodcourtservice.domain.spi.IRestaurantPersistencePort;
 import com.pragma.foodcourtservice.domain.spi.IUserFeignClientPort;
 import feign.FeignException;
 
+import java.util.List;
+
 public class RestaurantUseCase implements IRestaurantServicePort {
 
     private final IRestaurantPersistencePort restaurantPersistencePort;
@@ -58,5 +60,12 @@ public class RestaurantUseCase implements IRestaurantServicePort {
         restaurantEmployeeModel.setEmployeeId(employeeId);
         restaurantEmployeeModel.setRestaurant(restaurantModel);
         restaurantPersistencePort.saveRestaurantEmployee(restaurantEmployeeModel);
+    }
+
+    @Override
+    public List<RestaurantModel> getAllRestaurants(Integer page, Integer size) {
+        List<RestaurantModel> restaurantModelList = restaurantPersistencePort.getAllRestaurants(page, size);
+        if(restaurantModelList.isEmpty()) throw new DataNotFoundException("There are not restaurants");
+        return restaurantModelList;
     }
 }

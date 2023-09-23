@@ -2,12 +2,14 @@ package com.pragma.foodcourtservice.infraestructure.out.jpa.mapper;
 
 import com.pragma.foodcourtservice.domain.model.RestaurantModel;
 import com.pragma.foodcourtservice.infraestructure.out.jpa.entity.RestaurantEntity;
+import java.util.ArrayList;
+import java.util.List;
 import javax.annotation.processing.Generated;
 import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2023-09-21T01:04:17-0500",
+    date = "2023-09-23T00:35:25-0500",
     comments = "version: 1.5.5.Final, compiler: javac, environment: Java 17.0.8.1 (Amazon.com Inc.)"
 )
 @Component
@@ -49,5 +51,19 @@ public class IRestaurantEntityMapperImpl implements IRestaurantEntityMapper {
         restaurantModel.setOwnerId( restaurantEntity.getOwnerId() );
 
         return restaurantModel;
+    }
+
+    @Override
+    public List<RestaurantModel> mapToRestaurantModelList(List<RestaurantEntity> content) {
+        if ( content == null ) {
+            return null;
+        }
+
+        List<RestaurantModel> list = new ArrayList<RestaurantModel>( content.size() );
+        for ( RestaurantEntity restaurantEntity : content ) {
+            list.add( mapToRestaurantModel( restaurantEntity ) );
+        }
+
+        return list;
     }
 }

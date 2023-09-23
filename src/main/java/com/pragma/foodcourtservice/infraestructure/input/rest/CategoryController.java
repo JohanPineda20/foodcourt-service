@@ -44,7 +44,7 @@ public class CategoryController {
     }
     @Operation(summary = "Get all categories")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Get all categories", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = CategoryRequest.class)))),
+            @ApiResponse(responseCode = "200", description = "Get all categories", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = CategoryResponse.class)))),
             @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Exception"))),
             @ApiResponse(responseCode = "404", description = "There aren't categories", content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Exception")))
     })

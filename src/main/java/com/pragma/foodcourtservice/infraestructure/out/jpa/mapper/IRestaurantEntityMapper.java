@@ -5,6 +5,8 @@ import com.pragma.foodcourtservice.infraestructure.out.jpa.entity.RestaurantEnti
 import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;
 
+import java.util.List;
+
 @Mapper(componentModel = "spring",
         unmappedSourcePolicy = ReportingPolicy.IGNORE,
         unmappedTargetPolicy = ReportingPolicy.IGNORE)
@@ -12,4 +14,5 @@ public interface IRestaurantEntityMapper {
 
     RestaurantEntity mapToRestaurantEntity(RestaurantModel restaurantModel);
     RestaurantModel mapToRestaurantModel(RestaurantEntity restaurantEntity);
+    List<RestaurantModel> mapToRestaurantModelList(List<RestaurantEntity> content);
 }

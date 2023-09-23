@@ -35,9 +35,12 @@ public class ControllerAdvisor {
     public ResponseEntity<Map<String, String>> handleDataNotFoundException(DataNotFoundException dataNotFoundException){
         return new ResponseEntity<>(Collections.singletonMap(MESSAGE, dataNotFoundException.getMessage()),HttpStatus.NOT_FOUND);
     }
-
     @ExceptionHandler(DomainException.class)
     public ResponseEntity<Map<String, String>> handleDomainException(DomainException domainException){
         return new ResponseEntity<>(Collections.singletonMap(MESSAGE, domainException.getMessage()),HttpStatus.CONFLICT);
+    }
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<Map<String, String>> handleIllegalArgumentException(IllegalArgumentException illegalArgumentException){
+        return new ResponseEntity<>(Collections.singletonMap(MESSAGE, illegalArgumentException.getMessage()),HttpStatus.BAD_REQUEST);
     }
 }

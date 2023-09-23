@@ -3,11 +3,18 @@ package com.pragma.foodcourtservice.infraestructure.out.jpa.adapter;
 import com.pragma.foodcourtservice.domain.model.RestaurantEmployeeModel;
 import com.pragma.foodcourtservice.domain.model.RestaurantModel;
 import com.pragma.foodcourtservice.domain.spi.IRestaurantPersistencePort;
+import com.pragma.foodcourtservice.infraestructure.out.jpa.entity.RestaurantEntity;
 import com.pragma.foodcourtservice.infraestructure.out.jpa.mapper.IRestaurantEmployeeEntityMapper;
 import com.pragma.foodcourtservice.infraestructure.out.jpa.mapper.IRestaurantEntityMapper;
 import com.pragma.foodcourtservice.infraestructure.out.jpa.repository.IRestaurantEmployeeRepository;
 import com.pragma.foodcourtservice.infraestructure.out.jpa.repository.IRestaurantRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+
+import java.awt.print.Pageable;
+import java.util.List;
 
 @RequiredArgsConstructor
 public class RestaurantMysqlAdapter implements IRestaurantPersistencePort {
@@ -51,4 +58,10 @@ public class RestaurantMysqlAdapter implements IRestaurantPersistencePort {
     public void saveRestaurantEmployee(RestaurantEmployeeModel restaurantEmployeeModel) {
         restaurantEmployeeRepository.save(restaurantEmployeeEntityMapper.mapToRestaurantEmployeeEntity(restaurantEmployeeModel));
     }
+
+    @Override
+    public List<RestaurantModel> getAllRestaurants(Integer page, Integer size) {
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "name"));
+        Page<RestaurantEntity> restaurantEntityPage = restaurantRepository.findAll(pageRequest);
+        return restaurantEntityMapper.mapToRestaurantModelList(restaurantEntityPage.getContent());}
 }

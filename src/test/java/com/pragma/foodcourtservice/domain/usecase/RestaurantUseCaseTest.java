@@ -14,6 +14,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -132,7 +135,34 @@ class RestaurantUseCaseTest {
         assertThrows(DataNotFoundException.class, () -> restaurantUseCase.saveRestaurantEmployee(ownerId, employeeId));
         verify(restaurantPersistencePort, never()).saveRestaurantEmployee(any());
     }
+    @Test
+    void getAllRestaurants(){
+        Integer page = 1;
+        Integer size= 10;
+        List<RestaurantModel> restaurantModelList = List.of(createExampleRestaurant());
+        when(restaurantPersistencePort.getAllRestaurants(page,size)).thenReturn(restaurantModelList);
 
+        List<RestaurantModel> restaurantModelList1 = restaurantUseCase.getAllRestaurants(page,size);
+
+        assertEquals(restaurantModelList, restaurantModelList1);
+    }
+
+    @Test
+    void getAllRestaurantsNotFound(){
+        Integer page = 1;
+        Integer size= 10;
+        when(restaurantPersistencePort.getAllRestaurants(page,size)).thenReturn(new ArrayList<>());
+
+        assertThrows(DataNotFoundException.class, () -> restaurantUseCase.getAllRestaurants(page,size));
+    }
+    @Test
+    void getAllRestaurantsIllegalArgumentException(){
+        Integer page = -1;
+        Integer size= -10;
+        when(restaurantPersistencePort.getAllRestaurants(page,size)).thenThrow(IllegalArgumentException.class);
+
+        assertThrows(IllegalArgumentException.class, () -> restaurantUseCase.getAllRestaurants(page,size));
+    }
     private RestaurantModel createExampleRestaurant(){
         RestaurantModel restaurantModel = new RestaurantModel();
         restaurantModel.setName("rodizio");

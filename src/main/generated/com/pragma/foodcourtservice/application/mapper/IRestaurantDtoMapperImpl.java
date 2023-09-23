@@ -1,13 +1,16 @@
 package com.pragma.foodcourtservice.application.mapper;
 
 import com.pragma.foodcourtservice.application.dto.request.RestaurantRequest;
+import com.pragma.foodcourtservice.application.dto.response.RestaurantResponse;
 import com.pragma.foodcourtservice.domain.model.RestaurantModel;
+import java.util.ArrayList;
+import java.util.List;
 import javax.annotation.processing.Generated;
 import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2023-09-21T01:04:17-0500",
+    date = "2023-09-23T00:35:25-0500",
     comments = "version: 1.5.5.Final, compiler: javac, environment: Java 17.0.8.1 (Amazon.com Inc.)"
 )
 @Component
@@ -29,5 +32,35 @@ public class IRestaurantDtoMapperImpl implements IRestaurantDtoMapper {
         restaurantModel.setOwnerId( restaurantRequest.getOwnerId() );
 
         return restaurantModel;
+    }
+
+    @Override
+    public List<RestaurantResponse> mapToRestaurantResponseList(List<RestaurantModel> restaurantModelList) {
+        if ( restaurantModelList == null ) {
+            return null;
+        }
+
+        List<RestaurantResponse> list = new ArrayList<RestaurantResponse>( restaurantModelList.size() );
+        for ( RestaurantModel restaurantModel : restaurantModelList ) {
+            list.add( restaurantModelToRestaurantResponse( restaurantModel ) );
+        }
+
+        return list;
+    }
+
+    protected RestaurantResponse restaurantModelToRestaurantResponse(RestaurantModel restaurantModel) {
+        if ( restaurantModel == null ) {
+            return null;
+        }
+
+        String name = null;
+        String urlLogo = null;
+
+        name = restaurantModel.getName();
+        urlLogo = restaurantModel.getUrlLogo();
+
+        RestaurantResponse restaurantResponse = new RestaurantResponse( name, urlLogo );
+
+        return restaurantResponse;
     }
 }
