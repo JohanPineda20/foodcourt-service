@@ -2,15 +2,19 @@ package com.pragma.foodcourtservice.application.mapper;
 
 import com.pragma.foodcourtservice.application.dto.request.DishRequest;
 import com.pragma.foodcourtservice.application.dto.request.UpdateDishRequest;
+import com.pragma.foodcourtservice.application.dto.response.DishResponse;
 import com.pragma.foodcourtservice.domain.model.CategoryModel;
 import com.pragma.foodcourtservice.domain.model.DishModel;
 import com.pragma.foodcourtservice.domain.model.RestaurantModel;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 import javax.annotation.processing.Generated;
 import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2023-09-21T01:04:17-0500",
+    date = "2023-09-24T22:15:12-0500",
     comments = "version: 1.5.5.Final, compiler: javac, environment: Java 17.0.8.1 (Amazon.com Inc.)"
 )
 @Component
@@ -48,6 +52,20 @@ public class IDishDtoMapperImpl implements IDishDtoMapper {
         return dishModel;
     }
 
+    @Override
+    public List<DishResponse> mapToDishResponseList(List<DishModel> dishModelList) {
+        if ( dishModelList == null ) {
+            return null;
+        }
+
+        List<DishResponse> list = new ArrayList<DishResponse>( dishModelList.size() );
+        for ( DishModel dishModel : dishModelList ) {
+            list.add( dishModelToDishResponse( dishModel ) );
+        }
+
+        return list;
+    }
+
     protected CategoryModel dishRequestToCategoryModel(DishRequest dishRequest) {
         if ( dishRequest == null ) {
             return null;
@@ -70,5 +88,25 @@ public class IDishDtoMapperImpl implements IDishDtoMapper {
         restaurantModel.setId( dishRequest.getRestaurantId() );
 
         return restaurantModel;
+    }
+
+    protected DishResponse dishModelToDishResponse(DishModel dishModel) {
+        if ( dishModel == null ) {
+            return null;
+        }
+
+        String name = null;
+        String description = null;
+        BigDecimal price = null;
+        String urlImage = null;
+
+        name = dishModel.getName();
+        description = dishModel.getDescription();
+        price = dishModel.getPrice();
+        urlImage = dishModel.getUrlImage();
+
+        DishResponse dishResponse = new DishResponse( name, description, price, urlImage );
+
+        return dishResponse;
     }
 }

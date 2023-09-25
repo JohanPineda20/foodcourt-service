@@ -73,7 +73,7 @@ public class RestaurantController {
     @GetMapping
     @PreAuthorize("hasAuthority('CUSTOMER')")
     public ResponseEntity<List<RestaurantResponse>> getAllRestaurants(@RequestParam(defaultValue = "0") Integer page,
-                                                                      @RequestParam(defaultValue = "10")Integer size){
+                                                                      @RequestParam(defaultValue = "10") Integer size){
         return ResponseEntity.ok(restaurantHandler.getAllRestaurants(page, size));
     }
 

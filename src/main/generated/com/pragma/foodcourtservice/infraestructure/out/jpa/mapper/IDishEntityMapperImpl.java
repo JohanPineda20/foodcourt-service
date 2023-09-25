@@ -6,12 +6,14 @@ import com.pragma.foodcourtservice.domain.model.RestaurantModel;
 import com.pragma.foodcourtservice.infraestructure.out.jpa.entity.CategoryEntity;
 import com.pragma.foodcourtservice.infraestructure.out.jpa.entity.DishEntity;
 import com.pragma.foodcourtservice.infraestructure.out.jpa.entity.RestaurantEntity;
+import java.util.ArrayList;
+import java.util.List;
 import javax.annotation.processing.Generated;
 import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2023-09-21T01:04:17-0500",
+    date = "2023-09-24T22:15:12-0500",
     comments = "version: 1.5.5.Final, compiler: javac, environment: Java 17.0.8.1 (Amazon.com Inc.)"
 )
 @Component
@@ -55,6 +57,20 @@ public class IDishEntityMapperImpl implements IDishEntityMapper {
         dishModel.setCategory( categoryEntityToCategoryModel( dishEntity.getCategory() ) );
 
         return dishModel;
+    }
+
+    @Override
+    public List<DishModel> mapToDishModelList(List<DishEntity> dishEntityList) {
+        if ( dishEntityList == null ) {
+            return null;
+        }
+
+        List<DishModel> list = new ArrayList<DishModel>( dishEntityList.size() );
+        for ( DishEntity dishEntity : dishEntityList ) {
+            list.add( mapToDishModel( dishEntity ) );
+        }
+
+        return list;
     }
 
     protected RestaurantEntity restaurantModelToRestaurantEntity(RestaurantModel restaurantModel) {

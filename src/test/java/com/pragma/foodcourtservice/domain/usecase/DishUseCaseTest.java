@@ -17,6 +17,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -186,6 +188,72 @@ class DishUseCaseTest {
         assertTrue(dishModel.getActive());
     }
 
+    @Test
+    void getAllDishesByRestaurantAndCategory(){
+        Integer page = 1;
+        Integer size = 10;
+        Long restaurantId = 1L;
+        Long categoryId = 1L;
+        List<DishModel> dishModelList = List.of(createExampleDish());
+        when(restaurantPersistencePort.findById(restaurantId)).thenReturn(createExampleRestaurant());
+        when(dishPersistencePort.getAllDishesByRestaurant(page, size, restaurantId, true)).thenReturn(dishModelList);
+
+        List<DishModel> dishModelList1 = dishUseCase.getAllDishesByRestaurantAndCategory(page, size, restaurantId, categoryId);
+
+        assertEquals(dishModelList, dishModelList1);
+    }
+    @Test
+    void getAllDishesByRestaurantAndCategoryIsNull(){
+        Integer page = 1;
+        Integer size = 10;
+        Long restaurantId = 1L;
+        List<DishModel> dishModelList = List.of(createExampleDish());
+        when(restaurantPersistencePort.findById(restaurantId)).thenReturn(createExampleRestaurant());
+        when(dishPersistencePort.getAllDishesByRestaurant(page, size, restaurantId, true)).thenReturn(dishModelList);
+
+        List<DishModel> dishModelList1 = dishUseCase.getAllDishesByRestaurantAndCategory(page, size, restaurantId, null);
+
+        assertEquals(dishModelList, dishModelList1);
+    }
+    @Test
+    void getAllDishesByRestaurantAndCategoryRestaurantNotFound(){
+        Integer page = 1;
+        Integer size = 10;
+        Long restaurantId = 1L;
+        Long categoryId = 1L;
+        when(restaurantPersistencePort.findById(restaurantId)).thenReturn(null);
+
+        assertThrows(DataNotFoundException.class, () -> dishUseCase.getAllDishesByRestaurantAndCategory(page, size, restaurantId, categoryId));
+        verify(dishPersistencePort, never()).getAllDishesByRestaurant(page, size, restaurantId, true);
+    }
+
+    @Test
+    void getAllDishesByRestaurantAndCategoryEmptyList(){
+        Integer page = 1;
+        Integer size = 10;
+        Long restaurantId = 1L;
+        Long categoryId = 1L;
+
+        when(restaurantPersistencePort.findById(restaurantId)).thenReturn(createExampleRestaurant());
+        when(dishPersistencePort.getAllDishesByRestaurant(page, size, restaurantId, true)).thenReturn(new ArrayList<>());
+
+        assertThrows(DataNotFoundException.class, () -> dishUseCase.getAllDishesByRestaurantAndCategory(page, size, restaurantId, categoryId));
+    }
+
+    @Test
+    void getAllDishesByRestaurantAndCategoryNotMatches(){
+        Integer page = 1;
+        Integer size = 10;
+        Long restaurantId = 1L;
+        Long categoryId = 5L;
+        List<DishModel> dishModelList = List.of(createExampleDish());
+        when(restaurantPersistencePort.findById(restaurantId)).thenReturn(createExampleRestaurant());
+        when(dishPersistencePort.getAllDishesByRestaurant(page, size, restaurantId, true)).thenReturn(dishModelList);
+
+        assertThrows(DataNotFoundException.class, () -> dishUseCase.getAllDishesByRestaurantAndCategory(page, size, restaurantId, categoryId));
+    }
+
+
     private DishModel createExampleDish(){
         DishModel dishModel = new DishModel();
         dishModel.setName("terraza");
@@ -204,6 +272,4 @@ class DishUseCaseTest {
         restaurantModel.setOwnerId(1L);
         return restaurantModel;
     }
-
-
 }

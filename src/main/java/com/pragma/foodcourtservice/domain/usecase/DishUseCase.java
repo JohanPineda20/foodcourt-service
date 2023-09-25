@@ -12,6 +12,9 @@ import com.pragma.foodcourtservice.domain.spi.IDishPersistencePort;
 import com.pragma.foodcourtservice.domain.spi.IRestaurantPersistencePort;
 import com.pragma.foodcourtservice.domain.spi.ISecurityContextPort;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 public class DishUseCase implements IDishServicePort {
     private final IDishPersistencePort dishPersistencePort;
     private final ICategoryPersistencePort categoryPersistencePort;
@@ -65,6 +68,43 @@ public class DishUseCase implements IDishServicePort {
 
         dishModel.setActive(!dishModel.getActive());
         dishPersistencePort.save(dishModel);
+    }
+
+    @Override
+    public List<DishModel> getAllDishesByRestaurantAndCategory(Integer page, Integer size, Long restaurantId, Long categoryId) {
+        RestaurantModel restaurantModel = restaurantPersistencePort.findById(restaurantId);
+        if(restaurantModel == null) throw new DataNotFoundException("Restaurant not found");
+
+        //get all dishes of a restaurant
+        List<DishModel> dishModelList = dishPersistencePort.getAllDishesByRestaurant(page, size, restaurantId, true);
+        if(dishModelList.isEmpty()) throw new DataNotFoundException("There are no dishes available in the restaurant");
+
+        //if categoryId is null, then return the dishModelList with all dishes of a restaurant. if categoryId is not null, then filter the dishModelList by the categoryId.
+        if (categoryId != null) {
+            dishModelList = dishModelList.stream()
+                    .filter(dishModel -> categoryId == dishModel.getCategory().getId())
+                    .collect(Collectors.toList());
+
+            //if the filter return a empty list, then throw exception
+            if(dishModelList.isEmpty()) throw new DataNotFoundException("There are no dishes available in the restaurant with that category");
+        }
+
+        return dishModelList;
+
+
+       /* another way to do it
+       //if categoryId is null, return all dishes
+        List<DishModel> dishModelList;
+        if(categoryId == null) {
+            dishModelList = dishPersistencePort.getAllDishesByRestaurant(page, size, restaurantId, true);
+            if(dishModelList.isEmpty()) throw new DataNotFoundException("There are no dishes available in the restaurant");
+            return dishModelList;
+        }
+
+        //If categoryId is not null, then return only dishes of that category
+        dishModelList = dishPersistencePort.getAllDishesByRestaurantAndCategory(page, size, restaurantId,true, categoryId);
+        if(dishModelList.isEmpty()) throw new DataNotFoundException("There are no dishes available in the restaurant with that category");
+        return dishModelList;*/
     }
 
     private void validateOwnerRestaurant(Long ownerIdRestaurant){
