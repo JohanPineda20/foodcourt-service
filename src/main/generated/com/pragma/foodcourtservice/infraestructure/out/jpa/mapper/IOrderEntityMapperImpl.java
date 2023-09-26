@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2023-09-26T01:46:50-0500",
+    date = "2023-09-26T12:21:11-0500",
     comments = "version: 1.5.5.Final, compiler: javac, environment: Java 17.0.8.1 (Amazon.com Inc.)"
 )
 @Component
@@ -50,7 +50,7 @@ public class IOrderEntityMapperImpl implements IOrderEntityMapper {
         orderEntity.setId( orderModel.getId() );
         orderEntity.setCustomerId( orderModel.getCustomerId() );
         orderEntity.setCreatedAt( orderModel.getCreatedAt() );
-        orderEntity.setStatus( statusEnumModelToStatusEnum( orderModel.getStatus() ) );
+        orderEntity.setStatus( mapToStatusEnum( orderModel.getStatus() ) );
         orderEntity.setRestaurant( restaurantModelToRestaurantEntity( orderModel.getRestaurant() ) );
         orderEntity.setRestaurantEmployee( restaurantEmployeeModelToRestaurantEmployeeEntity( orderModel.getRestaurantEmployee() ) );
 
@@ -69,6 +69,31 @@ public class IOrderEntityMapperImpl implements IOrderEntityMapper {
         }
 
         return list;
+    }
+
+    @Override
+    public StatusEnum mapToStatusEnum(StatusEnumModel statusEnumModel) {
+        if ( statusEnumModel == null ) {
+            return null;
+        }
+
+        StatusEnum statusEnum;
+
+        switch ( statusEnumModel ) {
+            case PENDING: statusEnum = StatusEnum.PENDING;
+            break;
+            case IN_PREPARATION: statusEnum = StatusEnum.IN_PREPARATION;
+            break;
+            case READY: statusEnum = StatusEnum.READY;
+            break;
+            case DELIVERED: statusEnum = StatusEnum.DELIVERED;
+            break;
+            case CANCELLED: statusEnum = StatusEnum.CANCELLED;
+            break;
+            default: throw new IllegalArgumentException( "Unexpected enum constant: " + statusEnumModel );
+        }
+
+        return statusEnum;
     }
 
     protected StatusEnumModel statusEnumToStatusEnumModel(StatusEnum statusEnum) {
@@ -125,30 +150,6 @@ public class IOrderEntityMapperImpl implements IOrderEntityMapper {
         restaurantEmployeeModel.setRestaurant( restaurantEntityToRestaurantModel( restaurantEmployeeEntity.getRestaurant() ) );
 
         return restaurantEmployeeModel;
-    }
-
-    protected StatusEnum statusEnumModelToStatusEnum(StatusEnumModel statusEnumModel) {
-        if ( statusEnumModel == null ) {
-            return null;
-        }
-
-        StatusEnum statusEnum;
-
-        switch ( statusEnumModel ) {
-            case PENDING: statusEnum = StatusEnum.PENDING;
-            break;
-            case IN_PREPARATION: statusEnum = StatusEnum.IN_PREPARATION;
-            break;
-            case READY: statusEnum = StatusEnum.READY;
-            break;
-            case DELIVERED: statusEnum = StatusEnum.DELIVERED;
-            break;
-            case CANCELLED: statusEnum = StatusEnum.CANCELLED;
-            break;
-            default: throw new IllegalArgumentException( "Unexpected enum constant: " + statusEnumModel );
-        }
-
-        return statusEnum;
     }
 
     protected RestaurantEntity restaurantModelToRestaurantEntity(RestaurantModel restaurantModel) {

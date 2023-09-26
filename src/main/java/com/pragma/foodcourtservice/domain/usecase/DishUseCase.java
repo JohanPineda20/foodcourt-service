@@ -81,30 +81,11 @@ public class DishUseCase implements IDishServicePort {
 
         //if categoryId is null, then return the dishModelList with all dishes of a restaurant. if categoryId is not null, then filter the dishModelList by the categoryId.
         if (categoryId != null) {
-            dishModelList = dishModelList.stream()
-                    .filter(dishModel -> categoryId == dishModel.getCategory().getId())
-                    .collect(Collectors.toList());
-
-            //if the filter return a empty list, then throw exception
+            dishModelList = dishPersistencePort.getAllDishesByRestaurantAndCategory(page, size, restaurantId,true, categoryId);
             if(dishModelList.isEmpty()) throw new DataNotFoundException("There are no dishes available in the restaurant with that category");
         }
 
         return dishModelList;
-
-
-       /* another way to do it
-       //if categoryId is null, return all dishes
-        List<DishModel> dishModelList;
-        if(categoryId == null) {
-            dishModelList = dishPersistencePort.getAllDishesByRestaurant(page, size, restaurantId, true);
-            if(dishModelList.isEmpty()) throw new DataNotFoundException("There are no dishes available in the restaurant");
-            return dishModelList;
-        }
-
-        //If categoryId is not null, then return only dishes of that category
-        dishModelList = dishPersistencePort.getAllDishesByRestaurantAndCategory(page, size, restaurantId,true, categoryId);
-        if(dishModelList.isEmpty()) throw new DataNotFoundException("There are no dishes available in the restaurant with that category");
-        return dishModelList;*/
     }
 
     private void validateOwnerRestaurant(Long ownerIdRestaurant){

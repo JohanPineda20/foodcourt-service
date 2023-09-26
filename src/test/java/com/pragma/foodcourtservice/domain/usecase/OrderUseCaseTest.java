@@ -13,6 +13,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -138,6 +139,62 @@ class OrderUseCaseTest {
         orderModel.setRestaurant(new RestaurantModel(1L, null, null, null, null, null, null));
         orderModel.setDishes(createExampleDishes());
         return orderModel;
+    }
+
+    @Test
+    void getAllOrdersByRestaurantAndStatus(){
+        Integer page = 1;
+        Integer size = 10;
+        String status = "PENDING";
+        Long employeeId = 1L;
+        when(securityContextPort.getIdFromSecurityContext()).thenReturn(employeeId);
+        RestaurantEmployeeModel restaurantEmployeeModel = new RestaurantEmployeeModel();
+        restaurantEmployeeModel.setRestaurant(new RestaurantModel(1L, null, null, null, null, null, null));
+        when(restaurantPersistencePort.findRestaurantEmployeeByEmployeeId(employeeId)).thenReturn(restaurantEmployeeModel);
+        List<OrderModel> orderModelList = List.of(new OrderModel(1L, null, null, StatusEnumModel.PENDING, null, null, null));
+        when(orderPersistencePort.getAllOrdersByRestaurant(page, size, restaurantEmployeeModel.getRestaurant().getId())).thenReturn(orderModelList);
+        when(orderPersistencePort.getAllDishesByOrderId(1L)).thenReturn(List.of(new OrderDishModel()));
+        when(orderPersistencePort.getAllOrdersByRestaurantAndStatus(page, size, restaurantEmployeeModel.getRestaurant().getId(), StatusEnumModel.PENDING)).thenReturn(orderModelList);
+
+        List<OrderModel> orderModelList1 = orderUseCase.getAllOrdersByRestaurantAndStatus(page, size, status);
+
+        //La lista orderModelList1 porque la order que tiene es PENDING
+        assertEquals(orderModelList, orderModelList1);
+    }
+
+    @Test
+    void getAllOrdersByRestaurantAndStatusNotMatches(){
+        Integer page = 1;
+        Integer size = 10;
+        String status = "PENDING";
+        Long employeeId = 1L;
+        when(securityContextPort.getIdFromSecurityContext()).thenReturn(employeeId);
+        RestaurantEmployeeModel restaurantEmployeeModel = new RestaurantEmployeeModel();
+        restaurantEmployeeModel.setRestaurant(new RestaurantModel(1L, null, null, null, null, null, null));
+        when(restaurantPersistencePort.findRestaurantEmployeeByEmployeeId(employeeId)).thenReturn(restaurantEmployeeModel);
+        List<OrderModel> orderModelList = List.of(new OrderModel(1L, null, null, StatusEnumModel.CANCELLED, null, null, null));
+        when(orderPersistencePort.getAllOrdersByRestaurant(page, size, restaurantEmployeeModel.getRestaurant().getId())).thenReturn(orderModelList);
+        when(orderPersistencePort.getAllDishesByOrderId(1L)).thenReturn(List.of(new OrderDishModel()));
+        when(orderPersistencePort.getAllOrdersByRestaurantAndStatus(page, size, restaurantEmployeeModel.getRestaurant().getId(), StatusEnumModel.PENDING)).thenReturn(new ArrayList<>());
+
+        assertThrows(DataNotFoundException.class, () -> orderUseCase.getAllOrdersByRestaurantAndStatus(page, size, status));
+    }
+
+    @Test
+    void getAllOrdersByRestaurantAndStatusIsWrong(){
+        Integer page = 1;
+        Integer size = 10;
+        String status = "PENDIN";
+        Long employeeId = 1L;
+        when(securityContextPort.getIdFromSecurityContext()).thenReturn(employeeId);
+        RestaurantEmployeeModel restaurantEmployeeModel = new RestaurantEmployeeModel();
+        restaurantEmployeeModel.setRestaurant(new RestaurantModel(1L, null, null, null, null, null, null));
+        when(restaurantPersistencePort.findRestaurantEmployeeByEmployeeId(employeeId)).thenReturn(restaurantEmployeeModel);
+        List<OrderModel> orderModelList = List.of(new OrderModel(1L, null, null, StatusEnumModel.CANCELLED, null, null, null));
+        when(orderPersistencePort.getAllOrdersByRestaurant(page, size, restaurantEmployeeModel.getRestaurant().getId())).thenReturn(orderModelList);
+        when(orderPersistencePort.getAllDishesByOrderId(1L)).thenReturn(List.of(new OrderDishModel()));
+
+        assertThrows(DomainException.class, () -> orderUseCase.getAllOrdersByRestaurantAndStatus(page, size, status));
     }
 
     private List<OrderDishModel> createExampleDishes(){

@@ -197,6 +197,7 @@ class DishUseCaseTest {
         List<DishModel> dishModelList = List.of(createExampleDish());
         when(restaurantPersistencePort.findById(restaurantId)).thenReturn(createExampleRestaurant());
         when(dishPersistencePort.getAllDishesByRestaurant(page, size, restaurantId, true)).thenReturn(dishModelList);
+        when(dishPersistencePort.getAllDishesByRestaurantAndCategory(page, size, restaurantId,true, categoryId)).thenReturn(dishModelList);
 
         List<DishModel> dishModelList1 = dishUseCase.getAllDishesByRestaurantAndCategory(page, size, restaurantId, categoryId);
 
@@ -228,7 +229,7 @@ class DishUseCaseTest {
     }
 
     @Test
-    void getAllDishesByRestaurantAndCategoryEmptyList(){
+    void getAllDishesByRestaurantAndCategoryDishEmptyList(){
         Integer page = 1;
         Integer size = 10;
         Long restaurantId = 1L;
@@ -249,6 +250,7 @@ class DishUseCaseTest {
         List<DishModel> dishModelList = List.of(createExampleDish());
         when(restaurantPersistencePort.findById(restaurantId)).thenReturn(createExampleRestaurant());
         when(dishPersistencePort.getAllDishesByRestaurant(page, size, restaurantId, true)).thenReturn(dishModelList);
+        when(dishPersistencePort.getAllDishesByRestaurantAndCategory(page, size, restaurantId,true, categoryId)).thenReturn(new ArrayList<>());
 
         assertThrows(DataNotFoundException.class, () -> dishUseCase.getAllDishesByRestaurantAndCategory(page, size, restaurantId, categoryId));
     }

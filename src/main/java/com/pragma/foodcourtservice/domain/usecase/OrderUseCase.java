@@ -84,13 +84,12 @@ public class OrderUseCase implements IOrderServicePort {
             }
             if (statusEnumModel == null) throw new DomainException("Status " + status + " does not exist or is wrong!!!");
 
-            StatusEnumModel finalStatusEnumModel = statusEnumModel; //lambda error: variable used in lambda expression should be final.
-            orderModelList = orderModelList.stream()
-                    .filter(orderModel -> orderModel.getStatus() == finalStatusEnumModel)
-                    .collect(Collectors.toList());
-
-            //if the filter return a empty list, then throw exception
+            orderModelList = orderPersistencePort.getAllOrdersByRestaurantAndStatus(page, size, restaurantId, statusEnumModel);
             if(orderModelList.isEmpty()) throw new DataNotFoundException("There are no orders in the restaurant with that status");
+            for(OrderModel orderModel: orderModelList) { //add orderdishes to orders
+                List<OrderDishModel> dishes = orderPersistencePort.getAllDishesByOrderId(orderModel.getId());
+                orderModel.setDishes(dishes);
+            }
         }
 
         return orderModelList;

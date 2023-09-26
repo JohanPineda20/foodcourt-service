@@ -9,6 +9,5 @@ public interface IDishPersistencePort {
     void save(DishModel dishModel);
     DishModel findById(Long id);
     List<DishModel> getAllDishesByRestaurant(Integer page, Integer size, Long restaurantId, boolean active);
-
-    //List<DishModel> getAllDishesByRestaurantAndCategory(Integer page, Integer size, Long restaurantId, boolean active, Long categoryId);
+    List<DishModel> getAllDishesByRestaurantAndCategory(Integer page, Integer size, Long restaurantId, boolean active, Long categoryId);
 }

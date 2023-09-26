@@ -10,5 +10,5 @@ public interface IDishRepository extends JpaRepository<DishEntity,Long> {
     boolean existsByNameAndRestaurantId(String name, Long restaurantId);
     List<DishEntity> findByRestaurantIdAndActive(Pageable pageable, Long restaurantId, boolean active);
 
-    //List<DishEntity> findByRestaurantIdAndActiveAndCategoryId(Pageable pageable, Long restaurantId, boolean active, Long categoryId);
+    List<DishEntity> findByRestaurantIdAndActiveAndCategoryId(Pageable pageable, Long restaurantId, boolean active, Long categoryId);
 }

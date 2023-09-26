@@ -2,6 +2,7 @@ package com.pragma.foodcourtservice.infraestructure.out.jpa.adapter;
 
 import com.pragma.foodcourtservice.domain.model.OrderDishModel;
 import com.pragma.foodcourtservice.domain.model.OrderModel;
+import com.pragma.foodcourtservice.domain.model.StatusEnumModel;
 import com.pragma.foodcourtservice.domain.spi.IOrderPersistencePort;
 import com.pragma.foodcourtservice.infraestructure.out.jpa.entity.OrderDishEntity;
 import com.pragma.foodcourtservice.infraestructure.out.jpa.mapper.IOrderDishEntityMapper;
@@ -48,5 +49,11 @@ public class OrderMysqlAdapter implements IOrderPersistencePort {
     @Override
     public List<OrderDishModel> getAllDishesByOrderId(Long orderId) {
         return orderDishEntityMapper.mapToOrderDishModelList(orderDishRepository.findByOrderId(orderId));
+    }
+
+    @Override
+    public List<OrderModel> getAllOrdersByRestaurantAndStatus(Integer page, Integer size, Long restaurantId, StatusEnumModel statusEnumModel) {
+        Pageable pageable = PageRequest.of(page, size);
+        return orderEntityMapper.mapToOrderModelList(orderRepository.findByRestaurantIdAndStatus(pageable, restaurantId, orderEntityMapper.mapToStatusEnum(statusEnumModel)));
     }
 }

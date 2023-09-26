@@ -34,9 +34,9 @@ public class DishMysqlAdapter implements IDishPersistencePort {
         return dishEntityMapper.mapToDishModelList(dishRepository.findByRestaurantIdAndActive(pageable, restaurantId, active));
     }
 
-   /* @Override
+   @Override
     public List<DishModel> getAllDishesByRestaurantAndCategory(Integer page, Integer size, Long restaurantId, boolean active, Long categoryId) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "name"));
         return dishEntityMapper.mapToDishModelList(dishRepository.findByRestaurantIdAndActiveAndCategoryId(pageable, restaurantId, active, categoryId));
-    }*/
+    }
 }
