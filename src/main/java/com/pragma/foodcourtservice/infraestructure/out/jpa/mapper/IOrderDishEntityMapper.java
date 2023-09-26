@@ -13,5 +13,5 @@ import java.util.List;
 public interface IOrderDishEntityMapper {
 
     List<OrderDishEntity> mapToOrderDishEntityList(List<OrderDishModel> orderDishEntityList);
-
+    List<OrderDishModel> mapToOrderDishModelList(List<OrderDishEntity> orderDishEntityList);
 }

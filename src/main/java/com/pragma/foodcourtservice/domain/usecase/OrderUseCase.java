@@ -11,6 +11,7 @@ import com.pragma.foodcourtservice.domain.spi.ISecurityContextPort;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class OrderUseCase implements IOrderServicePort {
 
@@ -55,5 +56,43 @@ public class OrderUseCase implements IOrderServicePort {
             orderDishModel.setOrder(orderModel1);
         }
         orderPersistencePort.saveOrderDish(dishes);
+    }
+
+    @Override
+    public List<OrderModel> getAllOrdersByRestaurantAndStatus(Integer page, Integer size, String status) {
+        Long employeeId = securityContextPort.getIdFromSecurityContext();
+        RestaurantEmployeeModel restaurantEmployeeModel = restaurantPersistencePort.findRestaurantEmployeeByEmployeeId(employeeId);
+        if(restaurantEmployeeModel == null) throw new DataNotFoundException("Employee not found");
+
+        Long restaurantId = restaurantEmployeeModel.getRestaurant().getId();
+        List<OrderModel> orderModelList = orderPersistencePort.getAllOrdersByRestaurant(page, size, restaurantId);
+        if(orderModelList.isEmpty()) throw new DataNotFoundException("There are no orders in the restaurant");
+        for(OrderModel orderModel: orderModelList) { //add orderdishes to orders
+            List<OrderDishModel> dishes = orderPersistencePort.getAllDishesByOrderId(orderModel.getId());
+            orderModel.setDishes(dishes);
+        }
+
+        if (status != null) {
+            StatusEnumModel[] statuses = StatusEnumModel.values();
+            StatusEnumModel statusEnumModel = null;
+            int i = 0;
+            while(i < statuses.length && statusEnumModel == null) {
+                if (statuses[i].name().equalsIgnoreCase(status)) {
+                    statusEnumModel = statuses[i];
+                }
+                i++;
+            }
+            if (statusEnumModel == null) throw new DomainException("Status " + status + " does not exist or is wrong!!!");
+
+            StatusEnumModel finalStatusEnumModel = statusEnumModel; //lambda error: variable used in lambda expression should be final.
+            orderModelList = orderModelList.stream()
+                    .filter(orderModel -> orderModel.getStatus() == finalStatusEnumModel)
+                    .collect(Collectors.toList());
+
+            //if the filter return a empty list, then throw exception
+            if(orderModelList.isEmpty()) throw new DataNotFoundException("There are no orders in the restaurant with that status");
+        }
+
+        return orderModelList;
     }
 }

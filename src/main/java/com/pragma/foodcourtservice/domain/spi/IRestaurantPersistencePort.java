@@ -11,9 +11,8 @@ public interface IRestaurantPersistencePort {
     boolean existsByNit(String nit);
     RestaurantModel findByOwnerId(Long ownerId);
     RestaurantModel findById(Long id);
-
     boolean existsRestaurantEmployeeByEmployeeId(Long employeeId);
     void saveRestaurantEmployee(RestaurantEmployeeModel restaurantEmployeeModel);
-
     List<RestaurantModel> getAllRestaurants(Integer page, Integer size);
+    RestaurantEmployeeModel findRestaurantEmployeeByEmployeeId(Long employeeId);
 }

@@ -2,10 +2,17 @@ package com.pragma.foodcourtservice.application.mapper;
 
 import com.pragma.foodcourtservice.application.dto.request.OrderDishRequest;
 import com.pragma.foodcourtservice.application.dto.request.OrderRequest;
+import com.pragma.foodcourtservice.application.dto.response.OrderDishResponse;
+import com.pragma.foodcourtservice.application.dto.response.OrderResponse;
+import com.pragma.foodcourtservice.domain.model.CategoryModel;
 import com.pragma.foodcourtservice.domain.model.DishModel;
 import com.pragma.foodcourtservice.domain.model.OrderDishModel;
 import com.pragma.foodcourtservice.domain.model.OrderModel;
+import com.pragma.foodcourtservice.domain.model.RestaurantEmployeeModel;
 import com.pragma.foodcourtservice.domain.model.RestaurantModel;
+import com.pragma.foodcourtservice.domain.model.StatusEnumModel;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.processing.Generated;
@@ -13,7 +20,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2023-09-25T18:00:30-0500",
+    date = "2023-09-26T01:46:50-0500",
     comments = "version: 1.5.5.Final, compiler: javac, environment: Java 17.0.8.1 (Amazon.com Inc.)"
 )
 @Component
@@ -45,6 +52,68 @@ public class IOrderDtoMapperImpl implements IOrderDtoMapper {
         orderModel.setDishes( orderDishRequestListToOrderDishModelList( orderRequest.getDishes() ) );
 
         return orderModel;
+    }
+
+    @Override
+    public OrderResponse mapToOrderResponse(OrderModel orderModel) {
+        if ( orderModel == null ) {
+            return null;
+        }
+
+        Long employeeId = null;
+        String restaurantName = null;
+        List<OrderDishResponse> dishes = null;
+        Long id = null;
+        Long customerId = null;
+        LocalDateTime createdAt = null;
+        StatusEnumModel status = null;
+
+        employeeId = orderModelRestaurantEmployeeId( orderModel );
+        restaurantName = orderModelRestaurantName( orderModel );
+        dishes = orderDishModelListToOrderDishResponseList( orderModel.getDishes() );
+        id = orderModel.getId();
+        customerId = orderModel.getCustomerId();
+        createdAt = orderModel.getCreatedAt();
+        status = orderModel.getStatus();
+
+        OrderResponse orderResponse = new OrderResponse( id, customerId, createdAt, status, employeeId, restaurantName, dishes );
+
+        return orderResponse;
+    }
+
+    @Override
+    public OrderDishResponse mapToOrderResponse(OrderDishModel orderModel) {
+        if ( orderModel == null ) {
+            return null;
+        }
+
+        String dishName = null;
+        BigDecimal dishPrice = null;
+        String dishCategoryName = null;
+        Long amount = null;
+
+        dishName = orderModelDishName( orderModel );
+        dishPrice = orderModelDishPrice( orderModel );
+        dishCategoryName = orderModelDishCategoryName( orderModel );
+        amount = orderModel.getAmount();
+
+        OrderDishResponse orderDishResponse = new OrderDishResponse( dishName, dishPrice, dishCategoryName, amount );
+
+        return orderDishResponse;
+    }
+
+    @Override
+    public List<OrderResponse> mapToOrderResponseList(List<OrderModel> orderModelList) {
+        if ( orderModelList == null ) {
+            return null;
+        }
+
+        List<OrderResponse> list = new ArrayList<OrderResponse>( orderModelList.size() );
+        for ( OrderModel orderModel : orderModelList ) {
+            list.add( mapToOrderResponse( orderModel ) );
+        }
+
+        return list;
     }
 
     protected DishModel orderDishRequestToDishModel(OrderDishRequest orderDishRequest) {
@@ -82,5 +151,97 @@ public class IOrderDtoMapperImpl implements IOrderDtoMapper {
         }
 
         return list1;
+    }
+
+    private Long orderModelRestaurantEmployeeId(OrderModel orderModel) {
+        if ( orderModel == null ) {
+            return null;
+        }
+        RestaurantEmployeeModel restaurantEmployee = orderModel.getRestaurantEmployee();
+        if ( restaurantEmployee == null ) {
+            return null;
+        }
+        Long id = restaurantEmployee.getId();
+        if ( id == null ) {
+            return null;
+        }
+        return id;
+    }
+
+    private String orderModelRestaurantName(OrderModel orderModel) {
+        if ( orderModel == null ) {
+            return null;
+        }
+        RestaurantModel restaurant = orderModel.getRestaurant();
+        if ( restaurant == null ) {
+            return null;
+        }
+        String name = restaurant.getName();
+        if ( name == null ) {
+            return null;
+        }
+        return name;
+    }
+
+    protected List<OrderDishResponse> orderDishModelListToOrderDishResponseList(List<OrderDishModel> list) {
+        if ( list == null ) {
+            return null;
+        }
+
+        List<OrderDishResponse> list1 = new ArrayList<OrderDishResponse>( list.size() );
+        for ( OrderDishModel orderDishModel : list ) {
+            list1.add( mapToOrderResponse( orderDishModel ) );
+        }
+
+        return list1;
+    }
+
+    private String orderModelDishName(OrderDishModel orderDishModel) {
+        if ( orderDishModel == null ) {
+            return null;
+        }
+        DishModel dish = orderDishModel.getDish();
+        if ( dish == null ) {
+            return null;
+        }
+        String name = dish.getName();
+        if ( name == null ) {
+            return null;
+        }
+        return name;
+    }
+
+    private BigDecimal orderModelDishPrice(OrderDishModel orderDishModel) {
+        if ( orderDishModel == null ) {
+            return null;
+        }
+        DishModel dish = orderDishModel.getDish();
+        if ( dish == null ) {
+            return null;
+        }
+        BigDecimal price = dish.getPrice();
+        if ( price == null ) {
+            return null;
+        }
+        return price;
+    }
+
+    private String orderModelDishCategoryName(OrderDishModel orderDishModel) {
+        if ( orderDishModel == null ) {
+            return null;
+        }
+        DishModel dish = orderDishModel.getDish();
+        if ( dish == null ) {
+            return null;
+        }
+        CategoryModel category = dish.getCategory();
+        if ( category == null ) {
+            return null;
+        }
+        String name = category.getName();
+        if ( name == null ) {
+            return null;
+        }
+        return name;
     }
 }

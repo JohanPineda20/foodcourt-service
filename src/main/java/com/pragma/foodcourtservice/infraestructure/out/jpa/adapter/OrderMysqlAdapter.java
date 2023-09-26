@@ -9,6 +9,8 @@ import com.pragma.foodcourtservice.infraestructure.out.jpa.mapper.IOrderEntityMa
 import com.pragma.foodcourtservice.infraestructure.out.jpa.repository.IOrderDishRepository;
 import com.pragma.foodcourtservice.infraestructure.out.jpa.repository.IOrderRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -35,5 +37,16 @@ public class OrderMysqlAdapter implements IOrderPersistencePort {
     public void saveOrderDish(List<OrderDishModel> dishes) {
         List<OrderDishEntity> orderDishEntityList = orderDishEntityMapper.mapToOrderDishEntityList(dishes);
         orderDishRepository.saveAll(orderDishEntityList);
+    }
+
+    @Override
+    public List<OrderModel> getAllOrdersByRestaurant(Integer page, Integer size, Long restaurantId) {
+        Pageable pageable = PageRequest.of(page, size);
+        return orderEntityMapper.mapToOrderModelList(orderRepository.findByRestaurantId(pageable, restaurantId));
+    }
+
+    @Override
+    public List<OrderDishModel> getAllDishesByOrderId(Long orderId) {
+        return orderDishEntityMapper.mapToOrderDishModelList(orderDishRepository.findByOrderId(orderId));
     }
 }

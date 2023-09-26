@@ -64,4 +64,8 @@ public class RestaurantMysqlAdapter implements IRestaurantPersistencePort {
         PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "name"));
         Page<RestaurantEntity> restaurantEntityPage = restaurantRepository.findAll(pageRequest);
         return restaurantEntityMapper.mapToRestaurantModelList(restaurantEntityPage.getContent());}
+    @Override
+    public RestaurantEmployeeModel findRestaurantEmployeeByEmployeeId(Long employeeId) {
+        return restaurantEmployeeEntityMapper.mapToRestaurantEmployeeModel(restaurantEmployeeRepository.findByEmployeeId(employeeId).orElse(null));
+    }
 }

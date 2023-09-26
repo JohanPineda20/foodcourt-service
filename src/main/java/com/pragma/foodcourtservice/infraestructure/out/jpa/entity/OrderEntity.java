@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -35,4 +36,7 @@ public class OrderEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "chef_id")
     private RestaurantEmployeeEntity restaurantEmployee;
+
+    /*@OneToMany(mappedBy = "order") //cascade = CascadeType.ALL para guardar orderdish
+    private List<OrderDishEntity> dishes; //mejor no ya que genera stackoverflowexception al guardar y obtener */
 }
