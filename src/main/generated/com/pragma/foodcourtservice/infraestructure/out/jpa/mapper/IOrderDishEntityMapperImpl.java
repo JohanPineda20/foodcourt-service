@@ -1,0 +1,164 @@
+package com.pragma.foodcourtservice.infraestructure.out.jpa.mapper;
+
+import com.pragma.foodcourtservice.domain.model.CategoryModel;
+import com.pragma.foodcourtservice.domain.model.DishModel;
+import com.pragma.foodcourtservice.domain.model.OrderDishModel;
+import com.pragma.foodcourtservice.domain.model.OrderModel;
+import com.pragma.foodcourtservice.domain.model.RestaurantEmployeeModel;
+import com.pragma.foodcourtservice.domain.model.RestaurantModel;
+import com.pragma.foodcourtservice.domain.model.StatusEnumModel;
+import com.pragma.foodcourtservice.infraestructure.out.jpa.entity.CategoryEntity;
+import com.pragma.foodcourtservice.infraestructure.out.jpa.entity.DishEntity;
+import com.pragma.foodcourtservice.infraestructure.out.jpa.entity.OrderDishEntity;
+import com.pragma.foodcourtservice.infraestructure.out.jpa.entity.OrderEntity;
+import com.pragma.foodcourtservice.infraestructure.out.jpa.entity.RestaurantEmployeeEntity;
+import com.pragma.foodcourtservice.infraestructure.out.jpa.entity.RestaurantEntity;
+import com.pragma.foodcourtservice.infraestructure.out.jpa.entity.StatusEnum;
+import java.util.ArrayList;
+import java.util.List;
+import javax.annotation.processing.Generated;
+import org.springframework.stereotype.Component;
+
+@Generated(
+    value = "org.mapstruct.ap.MappingProcessor",
+    date = "2023-09-25T18:00:31-0500",
+    comments = "version: 1.5.5.Final, compiler: javac, environment: Java 17.0.8.1 (Amazon.com Inc.)"
+)
+@Component
+public class IOrderDishEntityMapperImpl implements IOrderDishEntityMapper {
+
+    @Override
+    public List<OrderDishEntity> mapToOrderDishEntityList(List<OrderDishModel> orderDishEntityList) {
+        if ( orderDishEntityList == null ) {
+            return null;
+        }
+
+        List<OrderDishEntity> list = new ArrayList<OrderDishEntity>( orderDishEntityList.size() );
+        for ( OrderDishModel orderDishModel : orderDishEntityList ) {
+            list.add( orderDishModelToOrderDishEntity( orderDishModel ) );
+        }
+
+        return list;
+    }
+
+    protected RestaurantEntity restaurantModelToRestaurantEntity(RestaurantModel restaurantModel) {
+        if ( restaurantModel == null ) {
+            return null;
+        }
+
+        RestaurantEntity restaurantEntity = new RestaurantEntity();
+
+        restaurantEntity.setId( restaurantModel.getId() );
+        restaurantEntity.setName( restaurantModel.getName() );
+        restaurantEntity.setNit( restaurantModel.getNit() );
+        restaurantEntity.setAddress( restaurantModel.getAddress() );
+        restaurantEntity.setPhone( restaurantModel.getPhone() );
+        restaurantEntity.setUrlLogo( restaurantModel.getUrlLogo() );
+        restaurantEntity.setOwnerId( restaurantModel.getOwnerId() );
+
+        return restaurantEntity;
+    }
+
+    protected CategoryEntity categoryModelToCategoryEntity(CategoryModel categoryModel) {
+        if ( categoryModel == null ) {
+            return null;
+        }
+
+        CategoryEntity categoryEntity = new CategoryEntity();
+
+        categoryEntity.setId( categoryModel.getId() );
+        categoryEntity.setName( categoryModel.getName() );
+        categoryEntity.setDescription( categoryModel.getDescription() );
+
+        return categoryEntity;
+    }
+
+    protected DishEntity dishModelToDishEntity(DishModel dishModel) {
+        if ( dishModel == null ) {
+            return null;
+        }
+
+        DishEntity dishEntity = new DishEntity();
+
+        dishEntity.setId( dishModel.getId() );
+        dishEntity.setName( dishModel.getName() );
+        dishEntity.setDescription( dishModel.getDescription() );
+        dishEntity.setUrlImage( dishModel.getUrlImage() );
+        dishEntity.setPrice( dishModel.getPrice() );
+        dishEntity.setActive( dishModel.getActive() );
+        dishEntity.setRestaurant( restaurantModelToRestaurantEntity( dishModel.getRestaurant() ) );
+        dishEntity.setCategory( categoryModelToCategoryEntity( dishModel.getCategory() ) );
+
+        return dishEntity;
+    }
+
+    protected StatusEnum statusEnumModelToStatusEnum(StatusEnumModel statusEnumModel) {
+        if ( statusEnumModel == null ) {
+            return null;
+        }
+
+        StatusEnum statusEnum;
+
+        switch ( statusEnumModel ) {
+            case PENDING: statusEnum = StatusEnum.PENDING;
+            break;
+            case IN_PREPARATION: statusEnum = StatusEnum.IN_PREPARATION;
+            break;
+            case READY: statusEnum = StatusEnum.READY;
+            break;
+            case DELIVERED: statusEnum = StatusEnum.DELIVERED;
+            break;
+            case CANCELLED: statusEnum = StatusEnum.CANCELLED;
+            break;
+            default: throw new IllegalArgumentException( "Unexpected enum constant: " + statusEnumModel );
+        }
+
+        return statusEnum;
+    }
+
+    protected RestaurantEmployeeEntity restaurantEmployeeModelToRestaurantEmployeeEntity(RestaurantEmployeeModel restaurantEmployeeModel) {
+        if ( restaurantEmployeeModel == null ) {
+            return null;
+        }
+
+        RestaurantEmployeeEntity restaurantEmployeeEntity = new RestaurantEmployeeEntity();
+
+        restaurantEmployeeEntity.setId( restaurantEmployeeModel.getId() );
+        restaurantEmployeeEntity.setEmployeeId( restaurantEmployeeModel.getEmployeeId() );
+        restaurantEmployeeEntity.setRestaurant( restaurantModelToRestaurantEntity( restaurantEmployeeModel.getRestaurant() ) );
+
+        return restaurantEmployeeEntity;
+    }
+
+    protected OrderEntity orderModelToOrderEntity(OrderModel orderModel) {
+        if ( orderModel == null ) {
+            return null;
+        }
+
+        OrderEntity orderEntity = new OrderEntity();
+
+        orderEntity.setId( orderModel.getId() );
+        orderEntity.setCustomerId( orderModel.getCustomerId() );
+        orderEntity.setCreatedAt( orderModel.getCreatedAt() );
+        orderEntity.setStatus( statusEnumModelToStatusEnum( orderModel.getStatus() ) );
+        orderEntity.setRestaurant( restaurantModelToRestaurantEntity( orderModel.getRestaurant() ) );
+        orderEntity.setRestaurantEmployee( restaurantEmployeeModelToRestaurantEmployeeEntity( orderModel.getRestaurantEmployee() ) );
+
+        return orderEntity;
+    }
+
+    protected OrderDishEntity orderDishModelToOrderDishEntity(OrderDishModel orderDishModel) {
+        if ( orderDishModel == null ) {
+            return null;
+        }
+
+        OrderDishEntity orderDishEntity = new OrderDishEntity();
+
+        orderDishEntity.setId( orderDishModel.getId() );
+        orderDishEntity.setDish( dishModelToDishEntity( orderDishModel.getDish() ) );
+        orderDishEntity.setOrder( orderModelToOrderEntity( orderDishModel.getOrder() ) );
+        orderDishEntity.setAmount( orderDishModel.getAmount() );
+
+        return orderDishEntity;
+    }
+}
