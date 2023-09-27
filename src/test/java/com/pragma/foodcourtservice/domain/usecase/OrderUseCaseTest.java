@@ -133,13 +133,6 @@ class OrderUseCaseTest {
         assertEquals(StatusEnumModel.PENDING, orderModel.getStatus());
         assertEquals(customerId, orderModel.getCustomerId());
     }
-        private OrderModel createExampleOrderModel(){
-        OrderModel orderModel = new OrderModel();
-        orderModel.setId(1L);
-        orderModel.setRestaurant(new RestaurantModel(1L, null, null, null, null, null, null));
-        orderModel.setDishes(createExampleDishes());
-        return orderModel;
-    }
 
     @Test
     void getAllOrdersByRestaurantAndStatus(){
@@ -196,7 +189,74 @@ class OrderUseCaseTest {
 
         assertThrows(DomainException.class, () -> orderUseCase.getAllOrdersByRestaurantAndStatus(page, size, status));
     }
+    @Test
+    void takeOrder(){
+        Long orderId = 1L;
+        OrderModel orderModel = createExampleOrderModel();
+        orderModel.setStatus(StatusEnumModel.PENDING);
+        when(orderPersistencePort.findById(orderId)).thenReturn(orderModel);
+        when(securityContextPort.getIdFromSecurityContext()).thenReturn(1L);
+        RestaurantEmployeeModel restaurantEmployeeModel = new RestaurantEmployeeModel();
+        restaurantEmployeeModel.setRestaurant(new RestaurantModel(1L, null, null, null, null, null, null));
+        when(restaurantPersistencePort.findRestaurantEmployeeByEmployeeId(1L)).thenReturn(restaurantEmployeeModel);
 
+        orderUseCase.takeOrder(orderId);
+
+        verify(orderPersistencePort, times(1)).save(orderModel);
+        assertEquals(restaurantEmployeeModel, orderModel.getRestaurantEmployee());
+        assertEquals(StatusEnumModel.IN_PREPARATION, orderModel.getStatus());
+    }
+    @Test
+    void takeOrderNotFound() {
+        Long orderId = 1L;
+        when(orderPersistencePort.findById(orderId)).thenReturn(null);
+
+        assertThrows(DataNotFoundException.class, () -> orderUseCase.takeOrder(orderId));
+
+        verify(orderPersistencePort, never()).save(any());
+    }
+    @Test
+    void takeOrderEmployeeNotWorkInRestaurant(){
+        Long orderId = 1L;
+        OrderModel orderModel = createExampleOrderModel();
+        orderModel.setStatus(StatusEnumModel.PENDING);
+        when(orderPersistencePort.findById(orderId)).thenReturn(orderModel);
+        when(securityContextPort.getIdFromSecurityContext()).thenReturn(1L);
+        RestaurantEmployeeModel restaurantEmployeeModel = new RestaurantEmployeeModel();
+        restaurantEmployeeModel.setRestaurant(new RestaurantModel(5L, null, null, null, null, null, null));
+        when(restaurantPersistencePort.findRestaurantEmployeeByEmployeeId(1L)).thenReturn(restaurantEmployeeModel);
+
+        assertThrows(DomainException.class, () -> orderUseCase.takeOrder(orderId));
+
+        verify(orderPersistencePort, never()).save(orderModel);
+        assertNull(orderModel.getRestaurantEmployee());
+        assertEquals(StatusEnumModel.PENDING, orderModel.getStatus());
+    }
+    @Test
+    void takeOrderStatusIsNotPending(){
+        Long orderId = 1L;
+        OrderModel orderModel = createExampleOrderModel();
+        orderModel.setStatus(StatusEnumModel.READY);
+        when(orderPersistencePort.findById(orderId)).thenReturn(orderModel);
+        when(securityContextPort.getIdFromSecurityContext()).thenReturn(1L);
+        RestaurantEmployeeModel restaurantEmployeeModel = new RestaurantEmployeeModel();
+        restaurantEmployeeModel.setRestaurant(new RestaurantModel(1L, null, null, null, null, null, null));
+        when(restaurantPersistencePort.findRestaurantEmployeeByEmployeeId(1L)).thenReturn(restaurantEmployeeModel);
+
+        assertThrows(DomainException.class, () -> orderUseCase.takeOrder(orderId));
+
+        verify(orderPersistencePort, never()).save(orderModel);
+        assertNull(orderModel.getRestaurantEmployee());
+        assertEquals(StatusEnumModel.READY, orderModel.getStatus());
+    }
+
+    private OrderModel createExampleOrderModel(){
+        OrderModel orderModel = new OrderModel();
+        orderModel.setId(1L);
+        orderModel.setRestaurant(new RestaurantModel(1L, null, null, null, null, null, null));
+        orderModel.setDishes(createExampleDishes());
+        return orderModel;
+    }
     private List<OrderDishModel> createExampleDishes(){
         OrderDishModel orderDishModel = new OrderDishModel();
         orderDishModel.setDish(new DishModel(1L,null,null,null,null,null,null,null));

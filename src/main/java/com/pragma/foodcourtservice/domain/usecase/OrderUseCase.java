@@ -94,4 +94,22 @@ public class OrderUseCase implements IOrderServicePort {
 
         return orderModelList;
     }
+
+    @Override
+    public void takeOrder(Long id) {
+        OrderModel orderModel = orderPersistencePort.findById(id);
+        if(orderModel == null) throw new DataNotFoundException("Order not found");
+
+        Long employeeId = securityContextPort.getIdFromSecurityContext();
+        RestaurantEmployeeModel restaurantEmployeeModel = restaurantPersistencePort.findRestaurantEmployeeByEmployeeId(employeeId);
+        if(restaurantEmployeeModel == null) throw new DataNotFoundException("Employee not found");
+        if(restaurantEmployeeModel.getRestaurant().getId() != orderModel.getRestaurant().getId()) throw new DomainException("Employee does not work in the restaurant");
+
+        if(!orderModel.getStatus().equals(StatusEnumModel.PENDING)
+                || orderModel.getRestaurantEmployee() != null) throw new DomainException("Order cannot be taken");
+
+        orderModel.setStatus(StatusEnumModel.IN_PREPARATION);
+        orderModel.setRestaurantEmployee(restaurantEmployeeModel);
+        orderPersistencePort.save(orderModel);
+    }
 }

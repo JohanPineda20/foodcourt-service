@@ -60,4 +60,20 @@ public class OrderController {
         return ResponseEntity.ok(orderHandler.getAllOrdersByRestaurantAndStatus(page, size, status));
     }
 
+    @Operation(summary = "Employee can take a pending order and change its status to in_preparation")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Order taken by a restaurant employee", content = @Content),
+            @ApiResponse(responseCode = "400", description = "Bad request: wrong input data", content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Exception"))),
+            @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Exception"))),
+            @ApiResponse(responseCode = "404", description = "Order not found, Employee not found", content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Exception"))),
+            @ApiResponse(responseCode = "409", description = "Employee does not work in the restaurant, Order cannot be taken", content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Exception"))),
+    })
+    @SecurityRequirement(name = "jwt")
+    @PatchMapping("/{id}/take")
+    @PreAuthorize("hasAuthority('EMPLOYEE')")
+    public ResponseEntity<Void> takeOrder(@PathVariable Long id){
+        orderHandler.takeOrder(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
 }

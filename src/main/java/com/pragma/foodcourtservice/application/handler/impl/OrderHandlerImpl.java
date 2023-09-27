@@ -28,4 +28,9 @@ public class OrderHandlerImpl implements IOrderHandler {
     public List<OrderResponse> getAllOrdersByRestaurantAndStatus(Integer page, Integer size, String status) {
         return orderDtoMapper.mapToOrderResponseList(orderServicePort.getAllOrdersByRestaurantAndStatus(page, size, status));
     }
+
+    @Override
+    public void takeOrder(Long id) {
+        orderServicePort.takeOrder(id);
+    }
 }
