@@ -33,7 +33,7 @@ public class OrderUseCase implements IOrderServicePort {
 
     @Override
     public void save(OrderModel orderModel) {
-        Long customerId = securityContextPort.getIdFromSecurityContext();
+        Long customerId = getIdFromSecurityContext();
         List<OrderModel> orderModelList = orderPersistencePort.findByCustomerId(customerId);
         int i = 0;
         while(i < orderModelList.size()){
@@ -64,7 +64,7 @@ public class OrderUseCase implements IOrderServicePort {
 
     @Override
     public List<OrderModel> getAllOrdersByRestaurantAndStatus(Integer page, Integer size, String status) {
-        Long employeeId = securityContextPort.getIdFromSecurityContext();
+        Long employeeId = getIdFromSecurityContext();
         RestaurantEmployeeModel restaurantEmployeeModel = restaurantPersistencePort.findRestaurantEmployeeByEmployeeId(employeeId);
         if(restaurantEmployeeModel == null) throw new DataNotFoundException("Employee not found");
 
@@ -77,15 +77,7 @@ public class OrderUseCase implements IOrderServicePort {
         }
 
         if (status != null) {
-            StatusEnumModel[] statuses = StatusEnumModel.values();
-            StatusEnumModel statusEnumModel = null;
-            int i = 0;
-            while(i < statuses.length && statusEnumModel == null) {
-                if (statuses[i].name().equalsIgnoreCase(status)) {
-                    statusEnumModel = statuses[i];
-                }
-                i++;
-            }
+            StatusEnumModel statusEnumModel = getStatusEnumModel(status);
             if (statusEnumModel == null) throw new DomainException("Status " + status + " does not exist or is wrong!!!");
 
             orderModelList = orderPersistencePort.getAllOrdersByRestaurantAndStatus(page, size, restaurantId, statusEnumModel);
@@ -101,13 +93,9 @@ public class OrderUseCase implements IOrderServicePort {
 
     @Override
     public void takeOrder(Long id) {
-        OrderModel orderModel = orderPersistencePort.findById(id);
-        if(orderModel == null) throw new DataNotFoundException("Order not found");
+        OrderModel orderModel = getOrderModel(id);
 
-        Long employeeId = securityContextPort.getIdFromSecurityContext();
-        RestaurantEmployeeModel restaurantEmployeeModel = restaurantPersistencePort.findRestaurantEmployeeByEmployeeId(employeeId);
-        if(restaurantEmployeeModel == null) throw new DataNotFoundException("Employee not found");
-        if(restaurantEmployeeModel.getRestaurant().getId() != orderModel.getRestaurant().getId()) throw new DomainException("Employee does not work in the restaurant");
+        RestaurantEmployeeModel restaurantEmployeeModel = validateEmployeeBelongsToRestaurant(orderModel);
 
         if(!orderModel.getStatus().equals(StatusEnumModel.PENDING)
                 || orderModel.getRestaurantEmployee() != null) throw new DomainException("Order cannot be taken");
@@ -119,13 +107,9 @@ public class OrderUseCase implements IOrderServicePort {
 
     @Override
     public void readyOrder(Long id) {
-        OrderModel orderModel = orderPersistencePort.findById(id);
-        if(orderModel == null) throw new DataNotFoundException("Order not found");
+        OrderModel orderModel = getOrderModel(id);
 
-        Long employeeId = securityContextPort.getIdFromSecurityContext();
-        RestaurantEmployeeModel restaurantEmployeeModel = restaurantPersistencePort.findRestaurantEmployeeByEmployeeId(employeeId);
-        if(restaurantEmployeeModel == null) throw new DataNotFoundException("Employee not found");
-        if(restaurantEmployeeModel.getRestaurant().getId() != orderModel.getRestaurant().getId()) throw new DomainException("Employee does not work in the restaurant");
+        RestaurantEmployeeModel restaurantEmployeeModel = validateEmployeeBelongsToRestaurant(orderModel);
 
         if(!orderModel.getStatus().equals(StatusEnumModel.IN_PREPARATION)
                 || orderModel.getRestaurantEmployee() == null) throw new DomainException("Order cannot be ready");
@@ -139,13 +123,30 @@ public class OrderUseCase implements IOrderServicePort {
         sendSMS("Your order is ready to pickup. You can get it by showing the following security pin: " + securityPin, "+573115330169");
     }
 
+    @Override
+    public void deliverOrder(Long id, String pin) {
+        OrderModel orderModel = getOrderModel(id);
+
+        RestaurantEmployeeModel restaurantEmployeeModel = validateEmployeeBelongsToRestaurant(orderModel);
+
+        if(!orderModel.getStatus().equals(StatusEnumModel.READY)
+                || orderModel.getRestaurantEmployee() == null) throw new DomainException("Order cannot be delivered");
+
+        if(restaurantEmployeeModel.getId() != orderModel.getRestaurantEmployee().getId()) throw new DomainException("Employee cannot deliver the order because the order was taken by another employee");
+
+        if(!createSecurityPin(orderModel).equals(pin)) throw new DomainException("Order cannot be delivered because the security pin is wrong");
+
+        orderModel.setStatus(StatusEnumModel.DELIVERED);
+        orderPersistencePort.save(orderModel);
+    }
+
     private String createSecurityPin(OrderModel orderModel){
         return  orderModel.getRestaurant().getName()
-                + orderModel.getId() +
+                + orderModel.getId()
                 + orderModel.getCustomerId()
-                + orderModel.getCreatedAt().format(DateTimeFormatter.ofPattern("ddMMyyyy"))
-                + orderModel.hashCode();
+                + orderModel.getCreatedAt().format(DateTimeFormatter.ofPattern("ddMMyyyy"));
     }
+
     private void sendSMS(String message, String cellphone){
         try {
             messengerFeignClientPort.sendMessage(message, cellphone);
@@ -153,4 +154,36 @@ public class OrderUseCase implements IOrderServicePort {
             throw new DomainException(e.getMessage());
         }
     }
+
+    private RestaurantEmployeeModel validateEmployeeBelongsToRestaurant(OrderModel orderModel) {
+        Long employeeId = getIdFromSecurityContext();
+        RestaurantEmployeeModel restaurantEmployeeModel = restaurantPersistencePort.findRestaurantEmployeeByEmployeeId(employeeId);
+        if(restaurantEmployeeModel == null) throw new DataNotFoundException("Employee not found");
+        if(restaurantEmployeeModel.getRestaurant().getId() != orderModel.getRestaurant().getId()) throw new DomainException("Employee does not work in the restaurant");
+        return restaurantEmployeeModel;
+    }
+
+    private Long getIdFromSecurityContext() {
+        return securityContextPort.getIdFromSecurityContext();
+    }
+
+    private OrderModel getOrderModel(Long id) {
+        OrderModel orderModel = orderPersistencePort.findById(id);
+        if(orderModel == null) throw new DataNotFoundException("Order not found");
+        return orderModel;
+    }
+
+    private StatusEnumModel getStatusEnumModel(String status) {
+        StatusEnumModel[] statuses = StatusEnumModel.values();
+        StatusEnumModel statusEnumModel = null;
+        int i = 0;
+        while(i < statuses.length && statusEnumModel == null) {
+            if (statuses[i].name().equalsIgnoreCase(status)) {
+                statusEnumModel = statuses[i];
+            }
+            i++;
+        }
+        return statusEnumModel;
+    }
+
 }

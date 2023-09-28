@@ -338,6 +338,26 @@ class OrderUseCaseTest {
         verify(orderPersistencePort, times(1)).save(orderModel);
         assertEquals(StatusEnumModel.READY, orderModel.getStatus());
     }
+    @Test
+    void deliverOrder(){
+        Long orderId = 1L;
+        OrderModel orderModel = createExampleOrderModel();
+        orderModel.setStatus(StatusEnumModel.READY);
+        orderModel.setRestaurantEmployee(new RestaurantEmployeeModel(1L, null, null));
+        orderModel.setCustomerId(5L);
+        orderModel.setCreatedAt(LocalDateTime.of(2023,10,16,7,8));
+        when(orderPersistencePort.findById(orderId)).thenReturn(orderModel);
+        when(securityContextPort.getIdFromSecurityContext()).thenReturn(1L);
+        RestaurantEmployeeModel restaurantEmployeeModel = new RestaurantEmployeeModel();
+        restaurantEmployeeModel.setId(1L);
+        restaurantEmployeeModel.setRestaurant(new RestaurantModel(1L, null, null, null, null, null, null));
+        when(restaurantPersistencePort.findRestaurantEmployeeByEmployeeId(1L)).thenReturn(restaurantEmployeeModel);
+
+        orderUseCase.deliverOrder(orderId, "juank1516102023");
+
+        verify(orderPersistencePort, times(1)).save(orderModel);
+        assertEquals(StatusEnumModel.DELIVERED, orderModel.getStatus());
+    }
 
     private OrderModel createExampleOrderModel(){
         OrderModel orderModel = new OrderModel();

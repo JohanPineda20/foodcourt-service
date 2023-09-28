@@ -35,4 +35,8 @@ public class OrderHandlerImpl implements IOrderHandler {
     public void readyOrder(Long id) {
         orderServicePort.readyOrder(id);
     }
+    @Override
+    public void deliverOrder(Long id, String pin) {
+        orderServicePort.deliverOrder(id, pin);
+    }
 }
