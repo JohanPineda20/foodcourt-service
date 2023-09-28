@@ -358,6 +358,65 @@ class OrderUseCaseTest {
         verify(orderPersistencePort, times(1)).save(orderModel);
         assertEquals(StatusEnumModel.DELIVERED, orderModel.getStatus());
     }
+    @Test
+    void cancelOrder(){
+        Long orderId = 1L;
+        OrderModel orderModel = createExampleOrderModel();
+        orderModel.setStatus(StatusEnumModel.PENDING);
+        orderModel.setCustomerId(1L);
+        when(orderPersistencePort.findById(orderId)).thenReturn(orderModel);
+        when(securityContextPort.getIdFromSecurityContext()).thenReturn(1L);
+
+        orderUseCase.cancelOrder(orderId);
+
+        verify(orderPersistencePort, times(1)).save(orderModel);
+        assertEquals(StatusEnumModel.CANCELLED, orderModel.getStatus());
+    }
+
+    @Test
+    void cancelOrderCustomerIsNotTheSame(){
+        Long orderId = 1L;
+        OrderModel orderModel = createExampleOrderModel();
+        orderModel.setStatus(StatusEnumModel.PENDING);
+        orderModel.setCustomerId(1L);
+        when(orderPersistencePort.findById(orderId)).thenReturn(orderModel);
+        when(securityContextPort.getIdFromSecurityContext()).thenReturn(5L);
+
+        assertThrows(DomainException.class, () -> orderUseCase.cancelOrder(orderId));
+
+        verify(orderPersistencePort, never()).save(orderModel);
+        assertEquals(StatusEnumModel.PENDING, orderModel.getStatus());
+    }
+    @Test
+    void cancelOrderStatusIsNotPending(){
+        Long orderId = 1L;
+        OrderModel orderModel = createExampleOrderModel();
+        orderModel.setStatus(StatusEnumModel.IN_PREPARATION);
+        orderModel.setCustomerId(1L);
+        when(orderPersistencePort.findById(orderId)).thenReturn(orderModel);
+        when(securityContextPort.getIdFromSecurityContext()).thenReturn(1L);
+
+        assertThrows(DomainException.class, () -> orderUseCase.cancelOrder(orderId));
+
+        verify(orderPersistencePort, never()).save(orderModel);
+        assertEquals(StatusEnumModel.IN_PREPARATION, orderModel.getStatus());
+    }
+
+    @Test
+    void cancelOrderStatusIsNotPendingFeignException(){
+        Long orderId = 1L;
+        OrderModel orderModel = createExampleOrderModel();
+        orderModel.setStatus(StatusEnumModel.IN_PREPARATION);
+        orderModel.setCustomerId(1L);
+        when(orderPersistencePort.findById(orderId)).thenReturn(orderModel);
+        when(securityContextPort.getIdFromSecurityContext()).thenReturn(1L);
+        doThrow(FeignException.class).when(messengerFeignClientPort).sendMessage(anyString(), anyString());
+
+        assertThrows(DomainException.class, () -> orderUseCase.cancelOrder(orderId));
+
+        verify(orderPersistencePort, never()).save(orderModel);
+        assertEquals(StatusEnumModel.IN_PREPARATION, orderModel.getStatus());
+    }
 
     private OrderModel createExampleOrderModel(){
         OrderModel orderModel = new OrderModel();

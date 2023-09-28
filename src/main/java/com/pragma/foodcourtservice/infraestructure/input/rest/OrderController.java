@@ -98,10 +98,26 @@ public class OrderController {
             @ApiResponse(responseCode = "404", description = "Order not found, Employee not found", content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Exception"))),
             @ApiResponse(responseCode = "409", description = "Employee does not work in the restaurant, Order cannot be delivered, Employee cannot deliver the order because the order was taken by another employee, Order cannot be delivered because the security pin is wrong", content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Exception"))),
     })
+    @SecurityRequirement(name = "jwt")
     @PatchMapping("/{id}/deliver")
     @PreAuthorize("hasAuthority('EMPLOYEE')")
     public ResponseEntity<Void> deliverOrder(@PathVariable Long id, @RequestParam String pin){
         orderHandler.deliverOrder(id, pin);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+    @Operation(summary = "Employee can deliver a ready order to customer when security pin is right")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Order delivered", content = @Content),
+            @ApiResponse(responseCode = "400", description = "Bad request: wrong input data", content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Exception"))),
+            @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Exception"))),
+            @ApiResponse(responseCode = "404", description = "Order not found", content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Exception"))),
+            @ApiResponse(responseCode = "409", description = "The customer must be the same customer who placed the order, Order cannot be canceled", content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Exception"))),
+    })
+    @SecurityRequirement(name = "jwt")
+    @PatchMapping("/{id}/cancel")
+    @PreAuthorize("hasAuthority('CUSTOMER')")
+    public ResponseEntity<Void> cancelOrder(@PathVariable Long id){
+        orderHandler.cancelOrder(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
     

@@ -140,6 +140,22 @@ public class OrderUseCase implements IOrderServicePort {
         orderPersistencePort.save(orderModel);
     }
 
+    @Override
+    public void cancelOrder(Long id) {
+        OrderModel orderModel = getOrderModel(id);
+
+        Long customerId = getIdFromSecurityContext();
+        if(customerId != orderModel.getCustomerId()) throw new DomainException("The customer must be the same customer who placed the order");
+
+        if(!orderModel.getStatus().equals(StatusEnumModel.PENDING)
+                || orderModel.getRestaurantEmployee() != null) {
+            sendSMS("Sorry, your order is already in preparation and cannot be canceled", "+573115330169");
+            throw new DomainException("Order cannot be canceled");
+        }
+        orderModel.setStatus(StatusEnumModel.CANCELLED);
+        orderPersistencePort.save(orderModel);
+    }
+
     private String createSecurityPin(OrderModel orderModel){
         return  orderModel.getRestaurant().getName()
                 + orderModel.getId()
