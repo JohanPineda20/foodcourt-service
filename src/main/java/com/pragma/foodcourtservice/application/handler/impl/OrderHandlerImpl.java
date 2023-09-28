@@ -23,14 +23,16 @@ public class OrderHandlerImpl implements IOrderHandler {
     public void save(OrderRequest orderRequest) {
         orderServicePort.save(orderDtoMapper.mapToOrderModel(orderRequest));
     }
-
     @Override
     public List<OrderResponse> getAllOrdersByRestaurantAndStatus(Integer page, Integer size, String status) {
         return orderDtoMapper.mapToOrderResponseList(orderServicePort.getAllOrdersByRestaurantAndStatus(page, size, status));
     }
-
     @Override
     public void takeOrder(Long id) {
         orderServicePort.takeOrder(id);
+    }
+    @Override
+    public void readyOrder(Long id) {
+        orderServicePort.readyOrder(id);
     }
 }

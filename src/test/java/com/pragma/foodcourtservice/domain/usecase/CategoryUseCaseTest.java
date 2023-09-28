@@ -3,7 +3,7 @@ package com.pragma.foodcourtservice.domain.usecase;
 import com.pragma.foodcourtservice.domain.exception.DataAlreadyExistsException;
 import com.pragma.foodcourtservice.domain.exception.DataNotFoundException;
 import com.pragma.foodcourtservice.domain.model.CategoryModel;
-import com.pragma.foodcourtservice.domain.spi.ICategoryPersistencePort;
+import com.pragma.foodcourtservice.domain.spi.persistence.ICategoryPersistencePort;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -11,7 +11,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;

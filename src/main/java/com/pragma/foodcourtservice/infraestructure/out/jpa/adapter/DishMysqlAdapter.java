@@ -1,7 +1,7 @@
 package com.pragma.foodcourtservice.infraestructure.out.jpa.adapter;
 
 import com.pragma.foodcourtservice.domain.model.DishModel;
-import com.pragma.foodcourtservice.domain.spi.IDishPersistencePort;
+import com.pragma.foodcourtservice.domain.spi.persistence.IDishPersistencePort;
 import com.pragma.foodcourtservice.infraestructure.out.jpa.mapper.IDishEntityMapper;
 import com.pragma.foodcourtservice.infraestructure.out.jpa.repository.IDishRepository;
 import lombok.RequiredArgsConstructor;

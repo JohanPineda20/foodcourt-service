@@ -1,4 +1,4 @@
-package com.pragma.foodcourtservice.domain.spi;
+package com.pragma.foodcourtservice.domain.spi.persistence;
 
 import com.pragma.foodcourtservice.domain.model.RestaurantEmployeeModel;
 import com.pragma.foodcourtservice.domain.model.RestaurantModel;

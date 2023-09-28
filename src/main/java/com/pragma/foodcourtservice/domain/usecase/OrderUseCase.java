@@ -4,14 +4,16 @@ import com.pragma.foodcourtservice.domain.api.IOrderServicePort;
 import com.pragma.foodcourtservice.domain.exception.DataNotFoundException;
 import com.pragma.foodcourtservice.domain.exception.DomainException;
 import com.pragma.foodcourtservice.domain.model.*;
-import com.pragma.foodcourtservice.domain.spi.IDishPersistencePort;
-import com.pragma.foodcourtservice.domain.spi.IOrderPersistencePort;
-import com.pragma.foodcourtservice.domain.spi.IRestaurantPersistencePort;
-import com.pragma.foodcourtservice.domain.spi.ISecurityContextPort;
+import com.pragma.foodcourtservice.domain.spi.feignclient.IMessengerFeignClientPort;
+import com.pragma.foodcourtservice.domain.spi.persistence.IDishPersistencePort;
+import com.pragma.foodcourtservice.domain.spi.persistence.IOrderPersistencePort;
+import com.pragma.foodcourtservice.domain.spi.persistence.IRestaurantPersistencePort;
+import com.pragma.foodcourtservice.domain.spi.securitycontext.ISecurityContextPort;
+import feign.FeignException;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class OrderUseCase implements IOrderServicePort {
 
@@ -19,12 +21,14 @@ public class OrderUseCase implements IOrderServicePort {
     private final ISecurityContextPort securityContextPort;
     private final IRestaurantPersistencePort restaurantPersistencePort;
     private final IDishPersistencePort dishPersistencePort;
+    private final IMessengerFeignClientPort messengerFeignClientPort;
 
-    public OrderUseCase(IOrderPersistencePort orderPersistencePort, ISecurityContextPort securityContextPort, IRestaurantPersistencePort restaurantPersistencePort, IDishPersistencePort dishPersistencePort) {
+    public OrderUseCase(IOrderPersistencePort orderPersistencePort, ISecurityContextPort securityContextPort, IRestaurantPersistencePort restaurantPersistencePort, IDishPersistencePort dishPersistencePort, IMessengerFeignClientPort messengerFeignClientPort) {
         this.orderPersistencePort = orderPersistencePort;
         this.securityContextPort = securityContextPort;
         this.restaurantPersistencePort = restaurantPersistencePort;
         this.dishPersistencePort = dishPersistencePort;
+        this.messengerFeignClientPort = messengerFeignClientPort;
     }
 
     @Override
@@ -111,5 +115,42 @@ public class OrderUseCase implements IOrderServicePort {
         orderModel.setStatus(StatusEnumModel.IN_PREPARATION);
         orderModel.setRestaurantEmployee(restaurantEmployeeModel);
         orderPersistencePort.save(orderModel);
+    }
+
+    @Override
+    public void readyOrder(Long id) {
+        OrderModel orderModel = orderPersistencePort.findById(id);
+        if(orderModel == null) throw new DataNotFoundException("Order not found");
+
+        Long employeeId = securityContextPort.getIdFromSecurityContext();
+        RestaurantEmployeeModel restaurantEmployeeModel = restaurantPersistencePort.findRestaurantEmployeeByEmployeeId(employeeId);
+        if(restaurantEmployeeModel == null) throw new DataNotFoundException("Employee not found");
+        if(restaurantEmployeeModel.getRestaurant().getId() != orderModel.getRestaurant().getId()) throw new DomainException("Employee does not work in the restaurant");
+
+        if(!orderModel.getStatus().equals(StatusEnumModel.IN_PREPARATION)
+                || orderModel.getRestaurantEmployee() == null) throw new DomainException("Order cannot be ready");
+
+        if(restaurantEmployeeModel.getId() != orderModel.getRestaurantEmployee().getId()) throw new DomainException("Employee cannot mark the order as ready because the order was taken by another employee");
+
+        orderModel.setStatus(StatusEnumModel.READY);
+        orderPersistencePort.save(orderModel);
+
+        String securityPin = createSecurityPin(orderModel);
+        sendSMS("Your order is ready to pickup. You can get it by showing the following security pin: " + securityPin, "+573115330169");
+    }
+
+    private String createSecurityPin(OrderModel orderModel){
+        return  orderModel.getRestaurant().getName()
+                + orderModel.getId() +
+                + orderModel.getCustomerId()
+                + orderModel.getCreatedAt().format(DateTimeFormatter.ofPattern("ddMMyyyy"))
+                + orderModel.hashCode();
+    }
+    private void sendSMS(String message, String cellphone){
+        try {
+            messengerFeignClientPort.sendMessage(message, cellphone);
+        }catch(FeignException e){
+            throw new DomainException(e.getMessage());
+        }
     }
 }

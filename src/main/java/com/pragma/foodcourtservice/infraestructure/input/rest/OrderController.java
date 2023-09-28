@@ -75,5 +75,20 @@ public class OrderController {
         orderHandler.takeOrder(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
-
+    @Operation(summary = "Employee can mark a in_preparation order as ready and send sms to customer")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Order marked as ready and sms sent to customer", content = @Content),
+            @ApiResponse(responseCode = "400", description = "Bad request: wrong input data", content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Exception"))),
+            @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Exception"))),
+            @ApiResponse(responseCode = "404", description = "Order not found, Employee not found", content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Exception"))),
+            @ApiResponse(responseCode = "409", description = "Employee does not work in the restaurant, Order cannot be ready, Employee cannot mark the order as ready because the order was taken by another employee, FeignException", content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Exception"))),
+    })
+    @SecurityRequirement(name = "jwt")
+    @PatchMapping("/{id}/ready")
+    @PreAuthorize("hasAuthority('EMPLOYEE')")
+    public ResponseEntity<Void> readyOrder(@PathVariable Long id){
+        orderHandler.readyOrder(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+    
 }

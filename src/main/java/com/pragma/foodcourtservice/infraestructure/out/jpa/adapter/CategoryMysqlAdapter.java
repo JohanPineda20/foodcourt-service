@@ -1,7 +1,7 @@
 package com.pragma.foodcourtservice.infraestructure.out.jpa.adapter;
 
 import com.pragma.foodcourtservice.domain.model.CategoryModel;
-import com.pragma.foodcourtservice.domain.spi.ICategoryPersistencePort;
+import com.pragma.foodcourtservice.domain.spi.persistence.ICategoryPersistencePort;
 import com.pragma.foodcourtservice.infraestructure.out.jpa.mapper.ICategoryEntityMapper;
 import com.pragma.foodcourtservice.infraestructure.out.jpa.repository.ICategoryRepository;
 import lombok.RequiredArgsConstructor;

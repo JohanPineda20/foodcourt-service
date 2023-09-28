@@ -2,7 +2,7 @@ package com.pragma.foodcourtservice.infraestructure.out.jpa.adapter;
 
 import com.pragma.foodcourtservice.domain.model.RestaurantEmployeeModel;
 import com.pragma.foodcourtservice.domain.model.RestaurantModel;
-import com.pragma.foodcourtservice.domain.spi.IRestaurantPersistencePort;
+import com.pragma.foodcourtservice.domain.spi.persistence.IRestaurantPersistencePort;
 import com.pragma.foodcourtservice.infraestructure.out.jpa.entity.RestaurantEntity;
 import com.pragma.foodcourtservice.infraestructure.out.jpa.mapper.IRestaurantEmployeeEntityMapper;
 import com.pragma.foodcourtservice.infraestructure.out.jpa.mapper.IRestaurantEntityMapper;
@@ -13,7 +13,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 
-import java.awt.print.Pageable;
 import java.util.List;
 
 @RequiredArgsConstructor

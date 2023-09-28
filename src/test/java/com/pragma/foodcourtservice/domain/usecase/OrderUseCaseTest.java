@@ -3,23 +3,25 @@ package com.pragma.foodcourtservice.domain.usecase;
 import com.pragma.foodcourtservice.domain.exception.DataNotFoundException;
 import com.pragma.foodcourtservice.domain.exception.DomainException;
 import com.pragma.foodcourtservice.domain.model.*;
-import com.pragma.foodcourtservice.domain.spi.IDishPersistencePort;
-import com.pragma.foodcourtservice.domain.spi.IOrderPersistencePort;
-import com.pragma.foodcourtservice.domain.spi.IRestaurantPersistencePort;
-import com.pragma.foodcourtservice.domain.spi.ISecurityContextPort;
+import com.pragma.foodcourtservice.domain.spi.feignclient.IMessengerFeignClientPort;
+import com.pragma.foodcourtservice.domain.spi.persistence.IDishPersistencePort;
+import com.pragma.foodcourtservice.domain.spi.persistence.IOrderPersistencePort;
+import com.pragma.foodcourtservice.domain.spi.persistence.IRestaurantPersistencePort;
+import com.pragma.foodcourtservice.domain.spi.securitycontext.ISecurityContextPort;
+import feign.FeignException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -34,6 +36,8 @@ class OrderUseCaseTest {
     IRestaurantPersistencePort restaurantPersistencePort;
     @Mock
     IDishPersistencePort dishPersistencePort;
+    @Mock
+    IMessengerFeignClientPort messengerFeignClientPort;
 
     @Test
     void save() {
@@ -250,10 +254,95 @@ class OrderUseCaseTest {
         assertEquals(StatusEnumModel.READY, orderModel.getStatus());
     }
 
+    @Test
+    void readyOrder(){
+        Long orderId = 1L;
+        OrderModel orderModel = createExampleOrderModel();
+        orderModel.setStatus(StatusEnumModel.IN_PREPARATION);
+        orderModel.setRestaurantEmployee(new RestaurantEmployeeModel(1L, null, null));
+        orderModel.setCustomerId(5L);
+        orderModel.setCreatedAt(LocalDateTime.of(2023,10,16,7,8));
+        when(orderPersistencePort.findById(orderId)).thenReturn(orderModel);
+        when(securityContextPort.getIdFromSecurityContext()).thenReturn(1L);
+        RestaurantEmployeeModel restaurantEmployeeModel = new RestaurantEmployeeModel();
+        restaurantEmployeeModel.setId(1L);
+        restaurantEmployeeModel.setRestaurant(new RestaurantModel(1L, null, null, null, null, null, null));
+        when(restaurantPersistencePort.findRestaurantEmployeeByEmployeeId(1L)).thenReturn(restaurantEmployeeModel);
+
+        orderUseCase.readyOrder(orderId);
+
+        verify(orderPersistencePort, times(1)).save(orderModel);
+        assertEquals(StatusEnumModel.READY, orderModel.getStatus());
+    }
+
+    @Test
+    void readyOrderWasTakenByAnotherEmployee(){
+        Long orderId = 1L;
+        OrderModel orderModel = createExampleOrderModel();
+        orderModel.setStatus(StatusEnumModel.IN_PREPARATION);
+        orderModel.setRestaurantEmployee(new RestaurantEmployeeModel(1L, null, null));
+        orderModel.setCustomerId(5L);
+        orderModel.setCreatedAt(LocalDateTime.of(2023,10,16,7,8));
+        when(orderPersistencePort.findById(orderId)).thenReturn(orderModel);
+        when(securityContextPort.getIdFromSecurityContext()).thenReturn(1L);
+        RestaurantEmployeeModel restaurantEmployeeModel = new RestaurantEmployeeModel();
+        restaurantEmployeeModel.setId(9L);
+        restaurantEmployeeModel.setRestaurant(new RestaurantModel(1L, null, null, null, null, null, null));
+        when(restaurantPersistencePort.findRestaurantEmployeeByEmployeeId(1L)).thenReturn(restaurantEmployeeModel);
+
+        assertThrows(DomainException.class, () -> orderUseCase.readyOrder(orderId));
+
+        verify(orderPersistencePort, never()).save(orderModel);
+        assertEquals(StatusEnumModel.IN_PREPARATION, orderModel.getStatus());
+    }
+
+    @Test
+    void readyOrderStatusIsNotInPreparation(){
+        Long orderId = 1L;
+        OrderModel orderModel = createExampleOrderModel();
+        orderModel.setStatus(StatusEnumModel.CANCELLED);
+        orderModel.setRestaurantEmployee(new RestaurantEmployeeModel(1L, null, null));
+        orderModel.setCustomerId(5L);
+        orderModel.setCreatedAt(LocalDateTime.of(2023,10,16,7,8));
+        when(orderPersistencePort.findById(orderId)).thenReturn(orderModel);
+        when(securityContextPort.getIdFromSecurityContext()).thenReturn(1L);
+        RestaurantEmployeeModel restaurantEmployeeModel = new RestaurantEmployeeModel();
+        restaurantEmployeeModel.setId(1L);
+        restaurantEmployeeModel.setRestaurant(new RestaurantModel(1L, null, null, null, null, null, null));
+        when(restaurantPersistencePort.findRestaurantEmployeeByEmployeeId(1L)).thenReturn(restaurantEmployeeModel);
+
+        assertThrows(DomainException.class, () -> orderUseCase.readyOrder(orderId));
+
+        verify(orderPersistencePort, never()).save(orderModel);
+        assertEquals(StatusEnumModel.CANCELLED, orderModel.getStatus());
+    }
+
+    @Test
+    void readyOrderFeignException(){
+        Long orderId = 1L;
+        OrderModel orderModel = createExampleOrderModel();
+        orderModel.setStatus(StatusEnumModel.IN_PREPARATION);
+        orderModel.setRestaurantEmployee(new RestaurantEmployeeModel(1L, null, null));
+        orderModel.setCustomerId(5L);
+        orderModel.setCreatedAt(LocalDateTime.of(2023,10,16,7,8));
+        when(orderPersistencePort.findById(orderId)).thenReturn(orderModel);
+        when(securityContextPort.getIdFromSecurityContext()).thenReturn(1L);
+        RestaurantEmployeeModel restaurantEmployeeModel = new RestaurantEmployeeModel();
+        restaurantEmployeeModel.setId(1L);
+        restaurantEmployeeModel.setRestaurant(new RestaurantModel(1L, null, null, null, null, null, null));
+        when(restaurantPersistencePort.findRestaurantEmployeeByEmployeeId(1L)).thenReturn(restaurantEmployeeModel);
+        doThrow(FeignException.class).when(messengerFeignClientPort).sendMessage(anyString(),anyString());
+
+        assertThrows(DomainException.class,() -> orderUseCase.readyOrder(orderId));
+
+        verify(orderPersistencePort, times(1)).save(orderModel);
+        assertEquals(StatusEnumModel.READY, orderModel.getStatus());
+    }
+
     private OrderModel createExampleOrderModel(){
         OrderModel orderModel = new OrderModel();
         orderModel.setId(1L);
-        orderModel.setRestaurant(new RestaurantModel(1L, null, null, null, null, null, null));
+        orderModel.setRestaurant(new RestaurantModel(1L, "juank", null, null, null, null, null));
         orderModel.setDishes(createExampleDishes());
         return orderModel;
     }

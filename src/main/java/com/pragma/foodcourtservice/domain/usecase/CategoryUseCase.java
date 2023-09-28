@@ -4,7 +4,7 @@ import com.pragma.foodcourtservice.domain.api.ICategoryServicePort;
 import com.pragma.foodcourtservice.domain.exception.DataAlreadyExistsException;
 import com.pragma.foodcourtservice.domain.exception.DataNotFoundException;
 import com.pragma.foodcourtservice.domain.model.CategoryModel;
-import com.pragma.foodcourtservice.domain.spi.ICategoryPersistencePort;
+import com.pragma.foodcourtservice.domain.spi.persistence.ICategoryPersistencePort;
 
 import java.util.List;
 

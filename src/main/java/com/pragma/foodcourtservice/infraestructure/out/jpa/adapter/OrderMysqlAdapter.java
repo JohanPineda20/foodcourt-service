@@ -3,7 +3,7 @@ package com.pragma.foodcourtservice.infraestructure.out.jpa.adapter;
 import com.pragma.foodcourtservice.domain.model.OrderDishModel;
 import com.pragma.foodcourtservice.domain.model.OrderModel;
 import com.pragma.foodcourtservice.domain.model.StatusEnumModel;
-import com.pragma.foodcourtservice.domain.spi.IOrderPersistencePort;
+import com.pragma.foodcourtservice.domain.spi.persistence.IOrderPersistencePort;
 import com.pragma.foodcourtservice.infraestructure.out.jpa.entity.OrderDishEntity;
 import com.pragma.foodcourtservice.infraestructure.out.jpa.mapper.IOrderDishEntityMapper;
 import com.pragma.foodcourtservice.infraestructure.out.jpa.mapper.IOrderEntityMapper;

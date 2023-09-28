@@ -1,4 +1,4 @@
-package com.pragma.foodcourtservice.domain.spi;
+package com.pragma.foodcourtservice.domain.spi.feignclient;
 
 
 import com.pragma.foodcourtservice.domain.model.UserModel;

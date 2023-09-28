@@ -1,7 +1,7 @@
 package com.pragma.foodcourtservice.infraestructure.out.securitycontext;
 
 import com.pragma.foodcourtservice.domain.model.UserModel;
-import com.pragma.foodcourtservice.domain.spi.ISecurityContextPort;
+import com.pragma.foodcourtservice.domain.spi.securitycontext.ISecurityContextPort;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 public class SecurityContextAdapter implements ISecurityContextPort {

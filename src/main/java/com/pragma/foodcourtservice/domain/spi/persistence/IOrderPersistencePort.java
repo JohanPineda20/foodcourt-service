@@ -1,4 +1,4 @@
-package com.pragma.foodcourtservice.domain.spi;
+package com.pragma.foodcourtservice.domain.spi.persistence;
 
 import com.pragma.foodcourtservice.domain.model.OrderDishModel;
 import com.pragma.foodcourtservice.domain.model.OrderModel;

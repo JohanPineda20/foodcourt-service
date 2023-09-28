@@ -8,4 +8,5 @@ public interface IOrderServicePort {
     void save(OrderModel orderModel);
     List<OrderModel> getAllOrdersByRestaurantAndStatus(Integer page, Integer size, String status);
     void takeOrder(Long id);
+    void readyOrder(Long id);
 }

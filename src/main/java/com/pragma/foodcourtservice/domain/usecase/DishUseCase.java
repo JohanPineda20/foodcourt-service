@@ -7,13 +7,12 @@ import com.pragma.foodcourtservice.domain.exception.DomainException;
 import com.pragma.foodcourtservice.domain.model.CategoryModel;
 import com.pragma.foodcourtservice.domain.model.DishModel;
 import com.pragma.foodcourtservice.domain.model.RestaurantModel;
-import com.pragma.foodcourtservice.domain.spi.ICategoryPersistencePort;
-import com.pragma.foodcourtservice.domain.spi.IDishPersistencePort;
-import com.pragma.foodcourtservice.domain.spi.IRestaurantPersistencePort;
-import com.pragma.foodcourtservice.domain.spi.ISecurityContextPort;
+import com.pragma.foodcourtservice.domain.spi.persistence.ICategoryPersistencePort;
+import com.pragma.foodcourtservice.domain.spi.persistence.IDishPersistencePort;
+import com.pragma.foodcourtservice.domain.spi.persistence.IRestaurantPersistencePort;
+import com.pragma.foodcourtservice.domain.spi.securitycontext.ISecurityContextPort;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class DishUseCase implements IDishServicePort {
     private final IDishPersistencePort dishPersistencePort;

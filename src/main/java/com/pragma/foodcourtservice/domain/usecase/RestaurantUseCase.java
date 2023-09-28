@@ -7,8 +7,8 @@ import com.pragma.foodcourtservice.domain.exception.DomainException;
 import com.pragma.foodcourtservice.domain.model.RestaurantEmployeeModel;
 import com.pragma.foodcourtservice.domain.model.RestaurantModel;
 import com.pragma.foodcourtservice.domain.model.UserModel;
-import com.pragma.foodcourtservice.domain.spi.IRestaurantPersistencePort;
-import com.pragma.foodcourtservice.domain.spi.IUserFeignClientPort;
+import com.pragma.foodcourtservice.domain.spi.persistence.IRestaurantPersistencePort;
+import com.pragma.foodcourtservice.domain.spi.feignclient.IUserFeignClientPort;
 import feign.FeignException;
 
 import java.util.List;
