@@ -4,8 +4,10 @@ import com.pragma.foodcourtservice.application.dto.request.OrderDishRequest;
 import com.pragma.foodcourtservice.application.dto.request.OrderRequest;
 import com.pragma.foodcourtservice.application.dto.response.OrderDishResponse;
 import com.pragma.foodcourtservice.application.dto.response.OrderResponse;
+import com.pragma.foodcourtservice.application.dto.response.TrackingResponse;
 import com.pragma.foodcourtservice.domain.model.OrderDishModel;
 import com.pragma.foodcourtservice.domain.model.OrderModel;
+import com.pragma.foodcourtservice.domain.model.TrackingModel;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
@@ -31,4 +33,6 @@ public interface IOrderDtoMapper {
     @Mapping(target = "dishCategoryName",source = "dish.category.name")
     OrderDishResponse mapToOrderResponse(OrderDishModel orderModel);
     List<OrderResponse> mapToOrderResponseList(List<OrderModel> orderModelList);
+
+    List<TrackingResponse> mapToTrackingResponseList(List<TrackingModel> trackingModelList);
 }

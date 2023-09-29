@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @AllArgsConstructor
 @Getter
-public class MessageRequest {
+public class MessageFeignDto {
     private String message;
     private String cellphone;
 }

@@ -4,6 +4,7 @@ import com.pragma.foodcourtservice.application.dto.request.OrderDishRequest;
 import com.pragma.foodcourtservice.application.dto.request.OrderRequest;
 import com.pragma.foodcourtservice.application.dto.response.OrderDishResponse;
 import com.pragma.foodcourtservice.application.dto.response.OrderResponse;
+import com.pragma.foodcourtservice.application.dto.response.TrackingResponse;
 import com.pragma.foodcourtservice.domain.model.CategoryModel;
 import com.pragma.foodcourtservice.domain.model.DishModel;
 import com.pragma.foodcourtservice.domain.model.OrderDishModel;
@@ -11,6 +12,7 @@ import com.pragma.foodcourtservice.domain.model.OrderModel;
 import com.pragma.foodcourtservice.domain.model.RestaurantEmployeeModel;
 import com.pragma.foodcourtservice.domain.model.RestaurantModel;
 import com.pragma.foodcourtservice.domain.model.StatusEnumModel;
+import com.pragma.foodcourtservice.domain.model.TrackingModel;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -20,7 +22,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2023-09-26T01:46:50-0500",
+    date = "2023-09-29T00:39:48-0500",
     comments = "version: 1.5.5.Final, compiler: javac, environment: Java 17.0.8.1 (Amazon.com Inc.)"
 )
 @Component
@@ -111,6 +113,20 @@ public class IOrderDtoMapperImpl implements IOrderDtoMapper {
         List<OrderResponse> list = new ArrayList<OrderResponse>( orderModelList.size() );
         for ( OrderModel orderModel : orderModelList ) {
             list.add( mapToOrderResponse( orderModel ) );
+        }
+
+        return list;
+    }
+
+    @Override
+    public List<TrackingResponse> mapToTrackingResponseList(List<TrackingModel> trackingModelList) {
+        if ( trackingModelList == null ) {
+            return null;
+        }
+
+        List<TrackingResponse> list = new ArrayList<TrackingResponse>( trackingModelList.size() );
+        for ( TrackingModel trackingModel : trackingModelList ) {
+            list.add( trackingModelToTrackingResponse( trackingModel ) );
         }
 
         return list;
@@ -243,5 +259,33 @@ public class IOrderDtoMapperImpl implements IOrderDtoMapper {
             return null;
         }
         return name;
+    }
+
+    protected TrackingResponse trackingModelToTrackingResponse(TrackingModel trackingModel) {
+        if ( trackingModel == null ) {
+            return null;
+        }
+
+        Long orderId = null;
+        Long customerId = null;
+        String customerEmail = null;
+        LocalDateTime datetime = null;
+        String statusPrevious = null;
+        String status = null;
+        Long employeeId = null;
+        String employeeEmail = null;
+
+        orderId = trackingModel.getOrderId();
+        customerId = trackingModel.getCustomerId();
+        customerEmail = trackingModel.getCustomerEmail();
+        datetime = trackingModel.getDatetime();
+        statusPrevious = trackingModel.getStatusPrevious();
+        status = trackingModel.getStatus();
+        employeeId = trackingModel.getEmployeeId();
+        employeeEmail = trackingModel.getEmployeeEmail();
+
+        TrackingResponse trackingResponse = new TrackingResponse( orderId, customerId, customerEmail, datetime, statusPrevious, status, employeeId, employeeEmail );
+
+        return trackingResponse;
     }
 }

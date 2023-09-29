@@ -3,6 +3,7 @@ package com.pragma.foodcourtservice.infraestructure.input.rest;
 import com.pragma.foodcourtservice.application.dto.request.OrderRequest;
 import com.pragma.foodcourtservice.application.dto.response.DishResponse;
 import com.pragma.foodcourtservice.application.dto.response.OrderResponse;
+import com.pragma.foodcourtservice.application.dto.response.TrackingResponse;
 import com.pragma.foodcourtservice.application.handler.IOrderHandler;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -120,5 +121,11 @@ public class OrderController {
         orderHandler.cancelOrder(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
-    
+
+    @GetMapping("/{id}/history")
+    @PreAuthorize("hasAuthority('CUSTOMER')")
+    public ResponseEntity<List<TrackingResponse>> getHistoryOrder(@PathVariable Long id){
+        return ResponseEntity.ok(orderHandler.getHistoryOrder(id));
+    }
+
 }

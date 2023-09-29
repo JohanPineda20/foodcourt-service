@@ -5,6 +5,7 @@ import com.pragma.foodcourtservice.domain.exception.DataNotFoundException;
 import com.pragma.foodcourtservice.domain.exception.DomainException;
 import com.pragma.foodcourtservice.domain.model.*;
 import com.pragma.foodcourtservice.domain.spi.feignclient.IMessengerFeignClientPort;
+import com.pragma.foodcourtservice.domain.spi.feignclient.ITrackingFeignClientPort;
 import com.pragma.foodcourtservice.domain.spi.persistence.IDishPersistencePort;
 import com.pragma.foodcourtservice.domain.spi.persistence.IOrderPersistencePort;
 import com.pragma.foodcourtservice.domain.spi.persistence.IRestaurantPersistencePort;
@@ -22,13 +23,15 @@ public class OrderUseCase implements IOrderServicePort {
     private final IRestaurantPersistencePort restaurantPersistencePort;
     private final IDishPersistencePort dishPersistencePort;
     private final IMessengerFeignClientPort messengerFeignClientPort;
+    private final ITrackingFeignClientPort trackingFeignClientPort;
 
-    public OrderUseCase(IOrderPersistencePort orderPersistencePort, ISecurityContextPort securityContextPort, IRestaurantPersistencePort restaurantPersistencePort, IDishPersistencePort dishPersistencePort, IMessengerFeignClientPort messengerFeignClientPort) {
+    public OrderUseCase(IOrderPersistencePort orderPersistencePort, ISecurityContextPort securityContextPort, IRestaurantPersistencePort restaurantPersistencePort, IDishPersistencePort dishPersistencePort, IMessengerFeignClientPort messengerFeignClientPort, ITrackingFeignClientPort trackingFeignClientPort) {
         this.orderPersistencePort = orderPersistencePort;
         this.securityContextPort = securityContextPort;
         this.restaurantPersistencePort = restaurantPersistencePort;
         this.dishPersistencePort = dishPersistencePort;
         this.messengerFeignClientPort = messengerFeignClientPort;
+        this.trackingFeignClientPort = trackingFeignClientPort;
     }
 
     @Override
@@ -60,6 +63,7 @@ public class OrderUseCase implements IOrderServicePort {
             orderDishModel.setOrder(orderModel1);
         }
         orderPersistencePort.saveOrderDish(dishes);
+        trackingOrder(orderModel1, "");
     }
 
     @Override
@@ -103,6 +107,7 @@ public class OrderUseCase implements IOrderServicePort {
         orderModel.setStatus(StatusEnumModel.IN_PREPARATION);
         orderModel.setRestaurantEmployee(restaurantEmployeeModel);
         orderPersistencePort.save(orderModel);
+        trackingOrder(orderModel, StatusEnumModel.PENDING.name());
     }
 
     @Override
@@ -121,6 +126,7 @@ public class OrderUseCase implements IOrderServicePort {
 
         String securityPin = createSecurityPin(orderModel);
         sendSMS("Your order is ready to pickup. You can get it by showing the following security pin: " + securityPin, "+573115330169");
+        trackingOrder(orderModel, StatusEnumModel.IN_PREPARATION.name());
     }
 
     @Override
@@ -138,6 +144,7 @@ public class OrderUseCase implements IOrderServicePort {
 
         orderModel.setStatus(StatusEnumModel.DELIVERED);
         orderPersistencePort.save(orderModel);
+        trackingOrder(orderModel, StatusEnumModel.READY.name());
     }
 
     @Override
@@ -154,6 +161,24 @@ public class OrderUseCase implements IOrderServicePort {
         }
         orderModel.setStatus(StatusEnumModel.CANCELLED);
         orderPersistencePort.save(orderModel);
+        trackingOrder(orderModel, StatusEnumModel.PENDING.name());
+    }
+
+    @Override
+    public List<TrackingModel> getHistoryOrder(Long id) {
+        OrderModel orderModel = getOrderModel(id);
+
+        Long customerId = getIdFromSecurityContext();
+        if(customerId != orderModel.getCustomerId()) throw new DomainException("The customer must be the same customer who placed the order");
+
+        List<TrackingModel> trackingModelList;
+        try {
+            trackingModelList = trackingFeignClientPort.getHistoryOrder(id);
+        }
+        catch(FeignException e){
+            throw new DomainException(e.getMessage());
+        }
+        return trackingModelList;
     }
 
     private String createSecurityPin(OrderModel orderModel){
@@ -200,6 +225,34 @@ public class OrderUseCase implements IOrderServicePort {
             i++;
         }
         return statusEnumModel;
+    }
+
+    private void trackingOrder(OrderModel orderModel, String previousStatus){
+        TrackingModel trackingModel = new TrackingModel();
+        trackingModel.setCustomerId(orderModel.getCustomerId());
+        trackingModel.setOrderId(orderModel.getId());
+        trackingModel.setStatusPrevious(previousStatus);
+        trackingModel.setStatus(orderModel.getStatus().name());
+        trackingModel.setDatetime(LocalDateTime.now());
+        if(orderModel.getRestaurantEmployee() == null) { //pending and canceled
+            trackingModel.setEmployeeId(0L);
+        }
+        else {
+            trackingModel.setEmployeeId(orderModel.getRestaurantEmployee().getId());
+        }
+        if(orderModel.getCustomerId().equals(getIdFromSecurityContext())){
+            trackingModel.setCustomerEmail(securityContextPort.getEmailFromSecurityContext());
+        }
+        else {
+            trackingModel.setEmployeeEmail(securityContextPort.getEmailFromSecurityContext());
+        }
+
+        try {
+            trackingFeignClientPort.trackingOrder(trackingModel);
+        }
+        catch(FeignException e){
+            throw new DomainException(e.getMessage());
+        }
     }
 
 }

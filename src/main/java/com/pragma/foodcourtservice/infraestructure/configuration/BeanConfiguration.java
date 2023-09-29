@@ -5,6 +5,7 @@ import com.pragma.foodcourtservice.domain.api.IDishServicePort;
 import com.pragma.foodcourtservice.domain.api.IOrderServicePort;
 import com.pragma.foodcourtservice.domain.api.IRestaurantServicePort;
 import com.pragma.foodcourtservice.domain.spi.feignclient.IMessengerFeignClientPort;
+import com.pragma.foodcourtservice.domain.spi.feignclient.ITrackingFeignClientPort;
 import com.pragma.foodcourtservice.domain.spi.feignclient.IUserFeignClientPort;
 import com.pragma.foodcourtservice.domain.spi.persistence.ICategoryPersistencePort;
 import com.pragma.foodcourtservice.domain.spi.persistence.IDishPersistencePort;
@@ -16,9 +17,12 @@ import com.pragma.foodcourtservice.domain.usecase.DishUseCase;
 import com.pragma.foodcourtservice.domain.usecase.OrderUseCase;
 import com.pragma.foodcourtservice.domain.usecase.RestaurantUseCase;
 import com.pragma.foodcourtservice.infraestructure.out.feignclient.IMessengerFeignClient;
+import com.pragma.foodcourtservice.infraestructure.out.feignclient.ITraceabilityFeignClient;
 import com.pragma.foodcourtservice.infraestructure.out.feignclient.IUserFeignClient;
 import com.pragma.foodcourtservice.infraestructure.out.feignclient.adapter.MessengerFeignClientAdapter;
+import com.pragma.foodcourtservice.infraestructure.out.feignclient.adapter.TrackingFeignClientAdapter;
 import com.pragma.foodcourtservice.infraestructure.out.feignclient.adapter.UserFeignClientAdapter;
+import com.pragma.foodcourtservice.infraestructure.out.feignclient.mapper.ITrackingFeignDtoMapper;
 import com.pragma.foodcourtservice.infraestructure.out.feignclient.mapper.IUserFeignDtoMapper;
 import com.pragma.foodcourtservice.infraestructure.out.jpa.adapter.CategoryMysqlAdapter;
 import com.pragma.foodcourtservice.infraestructure.out.jpa.adapter.DishMysqlAdapter;
@@ -46,6 +50,12 @@ public class BeanConfiguration {
     public IMessengerFeignClientPort messengerFeignClientPort(IMessengerFeignClient messengerFeignClient){
         return new MessengerFeignClientAdapter(messengerFeignClient);
     }
+    @Bean
+    public ITrackingFeignClientPort trackingFeignClientPort(ITraceabilityFeignClient traceabilityFeignClient, ITrackingFeignDtoMapper trackingFeignDtoMapper){
+        return new TrackingFeignClientAdapter(traceabilityFeignClient, trackingFeignDtoMapper);
+    }
+
+
 
     @Bean
     public ICategoryPersistencePort categoryPersistencePort(ICategoryRepository categoryRepository, ICategoryEntityMapper categoryEntityMapper){
@@ -64,6 +74,8 @@ public class BeanConfiguration {
         return new OrderMysqlAdapter(orderRepository, orderEntityMapper, orderDishRepository, orderDishEntityMapper);
     }
 
+
+
     @Bean
     public ICategoryServicePort categoryServicePort(ICategoryPersistencePort categoryPersistencePort){
         return new CategoryUseCase(categoryPersistencePort);
@@ -77,7 +89,7 @@ public class BeanConfiguration {
         return new DishUseCase(dishPersistencePort, categoryPersistencePort, restaurantPersistencePort, securityContextPort);
     }
     @Bean
-    public IOrderServicePort orderServicePort(IOrderPersistencePort orderPersistencePort, ISecurityContextPort securityContextPort, IRestaurantPersistencePort restaurantPersistencePort, IDishPersistencePort dishPersistencePort, IMessengerFeignClientPort messengerFeignClientPort){
-        return new OrderUseCase(orderPersistencePort, securityContextPort, restaurantPersistencePort, dishPersistencePort, messengerFeignClientPort);
+    public IOrderServicePort orderServicePort(IOrderPersistencePort orderPersistencePort, ISecurityContextPort securityContextPort, IRestaurantPersistencePort restaurantPersistencePort, IDishPersistencePort dishPersistencePort, IMessengerFeignClientPort messengerFeignClientPort, ITrackingFeignClientPort trackingFeignClientPort){
+        return new OrderUseCase(orderPersistencePort, securityContextPort, restaurantPersistencePort, dishPersistencePort, messengerFeignClientPort, trackingFeignClientPort);
     }
 }

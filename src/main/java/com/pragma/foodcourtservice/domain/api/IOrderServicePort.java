@@ -1,6 +1,7 @@
 package com.pragma.foodcourtservice.domain.api;
 
 import com.pragma.foodcourtservice.domain.model.OrderModel;
+import com.pragma.foodcourtservice.domain.model.TrackingModel;
 
 import java.util.List;
 
@@ -11,4 +12,5 @@ public interface IOrderServicePort {
     void readyOrder(Long id);
     void deliverOrder(Long id, String pin);
     void cancelOrder(Long id);
+    List<TrackingModel> getHistoryOrder(Long id);
 }

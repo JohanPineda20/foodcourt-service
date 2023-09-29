@@ -10,4 +10,10 @@ public class SecurityContextAdapter implements ISecurityContextPort {
         UserModel userModel = (UserModel) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         return userModel.getId();
     }
+
+    @Override
+    public String getEmailFromSecurityContext() {
+        UserModel userModel = (UserModel) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return userModel.getEmail();
+    }
 }

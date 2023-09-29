@@ -2,6 +2,7 @@ package com.pragma.foodcourtservice.application.handler.impl;
 
 import com.pragma.foodcourtservice.application.dto.request.OrderRequest;
 import com.pragma.foodcourtservice.application.dto.response.OrderResponse;
+import com.pragma.foodcourtservice.application.dto.response.TrackingResponse;
 import com.pragma.foodcourtservice.application.handler.IOrderHandler;
 import com.pragma.foodcourtservice.application.mapper.IOrderDtoMapper;
 import com.pragma.foodcourtservice.domain.api.IOrderServicePort;
@@ -43,5 +44,10 @@ public class OrderHandlerImpl implements IOrderHandler {
     @Override
     public void cancelOrder(Long id) {
         orderServicePort.cancelOrder(id);
+    }
+
+    @Override
+    public List<TrackingResponse> getHistoryOrder(Long id) {
+        return orderDtoMapper.mapToTrackingResponseList(orderServicePort.getHistoryOrder(id));
     }
 }
