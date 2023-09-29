@@ -106,9 +106,9 @@ public class OrderController {
         orderHandler.deliverOrder(id, pin);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
-    @Operation(summary = "Employee can deliver a ready order to customer when security pin is right")
+    @Operation(summary = "Customer can cancel the orden if its status is pending")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "Order delivered", content = @Content),
+            @ApiResponse(responseCode = "204", description = "Order canceled", content = @Content),
             @ApiResponse(responseCode = "400", description = "Bad request: wrong input data", content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Exception"))),
             @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Exception"))),
             @ApiResponse(responseCode = "404", description = "Order not found", content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Exception"))),
@@ -122,6 +122,15 @@ public class OrderController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
+    @Operation(summary = "Get history of order status changes")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "History checked", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = TrackingResponse.class)))),
+            @ApiResponse(responseCode = "400", description = "Bad request: wrong input data", content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Exception"))),
+            @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Exception"))),
+            @ApiResponse(responseCode = "404", description = "Order not found", content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Exception"))),
+            @ApiResponse(responseCode = "409", description = "The customer must be the same customer who placed the order, FeignException", content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Exception"))),
+    })
+    @SecurityRequirement(name = "jwt")
     @GetMapping("/{id}/history")
     @PreAuthorize("hasAuthority('CUSTOMER')")
     public ResponseEntity<List<TrackingResponse>> getHistoryOrder(@PathVariable Long id){

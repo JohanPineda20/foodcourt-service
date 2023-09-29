@@ -74,7 +74,7 @@ public class DishController {
     }
     @Operation(summary = "Get a list of dishes by restaurant and filter by category")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "List of dishes by restaurant and filter by category", content = @Content(array = @ArraySchema(schema = @Schema(implementation = DishResponse.class)))),
+            @ApiResponse(responseCode = "200", description = "List of dishes by restaurant and filter by category", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = DishResponse.class)))),
             @ApiResponse(responseCode = "400", description = "Bad request: wrong input data", content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Exception"))),
             @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Exception"))),
             @ApiResponse(responseCode = "404", description = "There are no dishes available in the restaurant with that category", content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Exception"))),

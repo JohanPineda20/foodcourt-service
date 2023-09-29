@@ -4,6 +4,7 @@ import com.pragma.foodcourtservice.domain.exception.DataNotFoundException;
 import com.pragma.foodcourtservice.domain.exception.DomainException;
 import com.pragma.foodcourtservice.domain.model.*;
 import com.pragma.foodcourtservice.domain.spi.feignclient.IMessengerFeignClientPort;
+import com.pragma.foodcourtservice.domain.spi.feignclient.ITrackingFeignClientPort;
 import com.pragma.foodcourtservice.domain.spi.persistence.IDishPersistencePort;
 import com.pragma.foodcourtservice.domain.spi.persistence.IOrderPersistencePort;
 import com.pragma.foodcourtservice.domain.spi.persistence.IRestaurantPersistencePort;
@@ -38,6 +39,8 @@ class OrderUseCaseTest {
     IDishPersistencePort dishPersistencePort;
     @Mock
     IMessengerFeignClientPort messengerFeignClientPort;
+    @Mock
+    ITrackingFeignClientPort trackingFeignClientPort;
 
     @Test
     void save() {
@@ -47,6 +50,7 @@ class OrderUseCaseTest {
     when(orderPersistencePort.findByCustomerId(customerId)).thenReturn(List.of(new OrderModel(null, null, null, StatusEnumModel.CANCELLED, null, null, null)));
     when(restaurantPersistencePort.findById(orderModel.getRestaurant().getId())).thenReturn(new RestaurantModel(1L, null, null, null, null, null, null));
     when(dishPersistencePort.findById(1L)).thenReturn(new DishModel(null,null,null,null,null, true, new RestaurantModel(1L, null, null, null, null, null, null), null));
+    when(orderPersistencePort.save(orderModel)).thenReturn(new OrderModel(1L,customerId,null,StatusEnumModel.PENDING,null,null,null));
 
     orderUseCase.save(orderModel);
 
@@ -54,6 +58,23 @@ class OrderUseCaseTest {
     verify(orderPersistencePort, times(1)).saveOrderDish(any());
     assertEquals(StatusEnumModel.PENDING, orderModel.getStatus());
     assertEquals(customerId, orderModel.getCustomerId());
+    }
+    @Test
+    void saveFeignException() {
+        OrderModel orderModel = createExampleOrderModel();
+        Long customerId = 1L;
+        when(securityContextPort.getIdFromSecurityContext()).thenReturn(customerId);
+        when(orderPersistencePort.findByCustomerId(customerId)).thenReturn(List.of(new OrderModel(null, null, null, StatusEnumModel.CANCELLED, null, null, null)));
+        when(restaurantPersistencePort.findById(orderModel.getRestaurant().getId())).thenReturn(new RestaurantModel(1L, null, null, null, null, null, null));
+        when(dishPersistencePort.findById(1L)).thenReturn(new DishModel(null, null, null, null, null, true, new RestaurantModel(1L, null, null, null, null, null, null), null));
+        when(orderPersistencePort.save(orderModel)).thenReturn(new OrderModel(1L, customerId, null, StatusEnumModel.PENDING, null, null, null));
+        doThrow(FeignException.class).when(trackingFeignClientPort).trackingOrder(any());
+
+        assertThrows(DomainException.class, () -> orderUseCase.save(orderModel));
+        verify(orderPersistencePort, times(1)).save(orderModel);
+        verify(orderPersistencePort, times(1)).saveOrderDish(any());
+        assertEquals(StatusEnumModel.PENDING, orderModel.getStatus());
+        assertEquals(customerId, orderModel.getCustomerId());
     }
 
     @Test
@@ -198,6 +219,7 @@ class OrderUseCaseTest {
         Long orderId = 1L;
         OrderModel orderModel = createExampleOrderModel();
         orderModel.setStatus(StatusEnumModel.PENDING);
+        orderModel.setCustomerId(1L);
         when(orderPersistencePort.findById(orderId)).thenReturn(orderModel);
         when(securityContextPort.getIdFromSecurityContext()).thenReturn(1L);
         RestaurantEmployeeModel restaurantEmployeeModel = new RestaurantEmployeeModel();
@@ -417,6 +439,48 @@ class OrderUseCaseTest {
         verify(orderPersistencePort, never()).save(orderModel);
         assertEquals(StatusEnumModel.IN_PREPARATION, orderModel.getStatus());
     }
+
+    @Test
+    void getHistoryOrder(){
+        Long orderId = 1L;
+        OrderModel orderModel = createExampleOrderModel();
+        orderModel.setCustomerId(1L);
+        when(orderPersistencePort.findById(orderId)).thenReturn(orderModel);
+        when(securityContextPort.getIdFromSecurityContext()).thenReturn(1L);
+        when(trackingFeignClientPort.getHistoryOrder(orderId)).thenReturn(new ArrayList<>());
+
+        List<TrackingModel> trackingModelList = orderUseCase.getHistoryOrder(orderId);
+
+        assertNotNull(trackingModelList);
+        verify(trackingFeignClientPort, times(1)).getHistoryOrder(orderId);
+    }
+
+    @Test
+    void getHistoryOrderCustomerIdNotMatches(){
+        Long orderId = 1L;
+        OrderModel orderModel = createExampleOrderModel();
+        orderModel.setCustomerId(7L);
+        when(orderPersistencePort.findById(orderId)).thenReturn(orderModel);
+        when(securityContextPort.getIdFromSecurityContext()).thenReturn(1L);
+
+        assertThrows(DomainException.class, () -> orderUseCase.getHistoryOrder(orderId));
+
+        verify(trackingFeignClientPort, never()).getHistoryOrder(orderId);
+    }
+
+    @Test
+    void getHistoryOrderFeignException(){
+        Long orderId = 1L;
+        OrderModel orderModel = createExampleOrderModel();
+        orderModel.setCustomerId(1L);
+        when(orderPersistencePort.findById(orderId)).thenReturn(orderModel);
+        when(securityContextPort.getIdFromSecurityContext()).thenReturn(1L);
+        when(trackingFeignClientPort.getHistoryOrder(orderId)).thenThrow(FeignException.class);
+
+        assertThrows(DomainException.class, () -> orderUseCase.getHistoryOrder(orderId));
+    }
+
+
 
     private OrderModel createExampleOrderModel(){
         OrderModel orderModel = new OrderModel();
