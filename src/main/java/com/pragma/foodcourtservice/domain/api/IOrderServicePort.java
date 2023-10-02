@@ -14,4 +14,5 @@ public interface IOrderServicePort {
     void cancelOrder(Long id);
     List<TrackingModel> getHistoryOrder(Long id);
     List<OrderModel> getOrderDuration(Integer page, Integer size);
+    List<Object[]> getRankingEmployee(Integer page, Integer size);
 }

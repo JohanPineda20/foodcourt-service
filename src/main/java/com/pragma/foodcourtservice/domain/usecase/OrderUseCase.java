@@ -190,8 +190,19 @@ public class OrderUseCase implements IOrderServicePort {
         if(restaurantModel == null) throw new DataNotFoundException("Owner does not a restaurant");
 
         List<OrderModel> orderModelList = orderPersistencePort.getAllOrdersByRestaurantAndStatus(page, size, restaurantModel.getId(), StatusEnumModel.DELIVERED);
-        if(orderModelList.isEmpty()) throw new DataNotFoundException("There are no orders delivered in the restaurant");
+        if(orderModelList.isEmpty()) throw new DataNotFoundException("There are no delivered orders in the restaurant");
         return orderModelList;
+    }
+
+    @Override
+    public List<Object[]> getRankingEmployee(Integer page, Integer size) {
+        Long ownerId = getIdFromSecurityContext();
+        RestaurantModel restaurantModel = restaurantPersistencePort.findByOwnerId(ownerId);
+        if(restaurantModel == null) throw new DataNotFoundException("Owner does not a restaurant");
+
+        List<Object[]> objectList = orderPersistencePort.getRankingEmployee(page, size, restaurantModel.getId(), StatusEnumModel.DELIVERED);
+        if(objectList.isEmpty()) throw new DataNotFoundException("There are no delivered orders in the restaurant");
+        return objectList;
     }
 
     private String createSecurityPin(OrderModel orderModel){

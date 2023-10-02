@@ -2,6 +2,7 @@ package com.pragma.foodcourtservice.application.handler.impl;
 
 import com.pragma.foodcourtservice.application.dto.request.OrderRequest;
 import com.pragma.foodcourtservice.application.dto.response.OrderDurationResponse;
+import com.pragma.foodcourtservice.application.dto.response.OrderRankingResponse;
 import com.pragma.foodcourtservice.application.dto.response.OrderResponse;
 import com.pragma.foodcourtservice.application.dto.response.TrackingResponse;
 import com.pragma.foodcourtservice.application.handler.IOrderHandler;
@@ -12,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -55,5 +57,13 @@ public class OrderHandlerImpl implements IOrderHandler {
     @Override
     public List<OrderDurationResponse> getOrderDuration(Integer page, Integer size) {
         return orderDtoMapper.mapToOrderDurationResponseList(orderServicePort.getOrderDuration(page, size));
+    }
+
+    @Override
+    public List<OrderRankingResponse> getRankingEmployee(Integer page, Integer size) {
+        List<Object[]> objectList = orderServicePort.getRankingEmployee(page, size);
+        return objectList.stream()
+                .map(fields -> new OrderRankingResponse((long)fields[0], (double)fields[1]))
+                .toList();
     }
 }

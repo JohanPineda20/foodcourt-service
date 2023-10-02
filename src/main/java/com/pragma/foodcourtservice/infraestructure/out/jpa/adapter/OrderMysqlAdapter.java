@@ -61,4 +61,10 @@ public class OrderMysqlAdapter implements IOrderPersistencePort {
     public OrderModel findById(Long id) {
         return orderEntityMapper.mapToOrderModel(orderRepository.findById(id).orElse(null));
     }
+
+    @Override
+    public List<Object[]> getRankingEmployee(Integer page, Integer size, Long restaurantId, StatusEnumModel statusEnumModel) {
+        Pageable pageable = PageRequest.of(page, size);
+        return orderRepository.getRankingEmployee(restaurantId, orderEntityMapper.mapToStatusEnum(statusEnumModel), pageable);
+    }
 }

@@ -1,10 +1,7 @@
 package com.pragma.foodcourtservice.infraestructure.input.rest;
 
 import com.pragma.foodcourtservice.application.dto.request.OrderRequest;
-import com.pragma.foodcourtservice.application.dto.response.DishResponse;
-import com.pragma.foodcourtservice.application.dto.response.OrderDurationResponse;
-import com.pragma.foodcourtservice.application.dto.response.OrderResponse;
-import com.pragma.foodcourtservice.application.dto.response.TrackingResponse;
+import com.pragma.foodcourtservice.application.dto.response.*;
 import com.pragma.foodcourtservice.application.handler.IOrderHandler;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -150,6 +147,20 @@ public class OrderController {
     public ResponseEntity<List<OrderDurationResponse>> getOrderDuration(@RequestParam(defaultValue = "0") Integer page,
                                                                         @RequestParam(defaultValue = "10") Integer size){
         return ResponseEntity.ok(orderHandler.getOrderDuration(page, size));
+    }
+    @Operation(summary = "Get the ranking of employees ordered by the average order completion time")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "ranking checked", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = OrderRankingResponse.class)))),
+            @ApiResponse(responseCode = "400", description = "Bad request: wrong input data", content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Exception"))),
+            @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Exception"))),
+            @ApiResponse(responseCode = "404", description = "Owner does not a restaurant, There are no orders delivered in the restaurant", content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Exception")))
+    })
+    @SecurityRequirement(name = "jwt")
+    @GetMapping("/ranking")
+    @PreAuthorize("hasAuthority('OWNER')")
+    public ResponseEntity<List<OrderRankingResponse>> getRankingEmployee(@RequestParam(defaultValue = "0") Integer page,
+                                                                         @RequestParam(defaultValue = "10") Integer size){
+        return ResponseEntity.ok(orderHandler.getRankingEmployee(page, size));
     }
 
 }

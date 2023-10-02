@@ -14,4 +14,5 @@ public interface IOrderPersistencePort {
     List<OrderDishModel> getAllDishesByOrderId(Long orderId);
     List<OrderModel> getAllOrdersByRestaurantAndStatus(Integer page, Integer size, Long restaurantId, StatusEnumModel statusEnumModel);
     OrderModel findById(Long id);
+    List<Object[]> getRankingEmployee(Integer page, Integer size, Long restaurantId, StatusEnumModel statusEnumModel);
 }

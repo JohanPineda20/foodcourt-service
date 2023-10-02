@@ -2,6 +2,7 @@ package com.pragma.foodcourtservice.application.handler;
 
 import com.pragma.foodcourtservice.application.dto.request.OrderRequest;
 import com.pragma.foodcourtservice.application.dto.response.OrderDurationResponse;
+import com.pragma.foodcourtservice.application.dto.response.OrderRankingResponse;
 import com.pragma.foodcourtservice.application.dto.response.OrderResponse;
 import com.pragma.foodcourtservice.application.dto.response.TrackingResponse;
 
@@ -16,4 +17,5 @@ public interface IOrderHandler {
     void cancelOrder(Long id);
     List<TrackingResponse> getHistoryOrder(Long id);
     List<OrderDurationResponse> getOrderDuration(Integer page, Integer size);
+    List<OrderRankingResponse> getRankingEmployee(Integer page, Integer size);
 }

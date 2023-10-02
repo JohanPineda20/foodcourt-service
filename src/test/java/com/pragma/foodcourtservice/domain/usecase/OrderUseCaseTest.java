@@ -505,7 +505,6 @@ class OrderUseCaseTest {
         assertThrows(DataNotFoundException.class, () -> orderUseCase.getOrderDuration(page, size));
         verify(orderPersistencePort, never()).getAllOrdersByRestaurantAndStatus(eq(page), eq(size), anyLong(), eq(StatusEnumModel.DELIVERED));
     }
-
     @Test
     void getOrderDurationEmptyList() {
         Long ownerId = 1L;
@@ -519,7 +518,44 @@ class OrderUseCaseTest {
         assertThrows(DataNotFoundException.class, () -> orderUseCase.getOrderDuration(page, size));
     }
 
+    @Test
+    void getRankingEmployee(){
+        Long ownerId = 1L;
+        Integer page = 0;
+        Integer size = 10;
+        when(securityContextPort.getIdFromSecurityContext()).thenReturn(ownerId);
+        RestaurantModel restaurantModel = new RestaurantModel(1L, null, null, null, null, null, null);
+        when(restaurantPersistencePort.findByOwnerId(ownerId)).thenReturn(restaurantModel);
+        List<Object[]> objectList = List.of(new Object[1], new Object[1]);
+        when(orderPersistencePort.getRankingEmployee(page, size, restaurantModel.getId(), StatusEnumModel.DELIVERED)).thenReturn(objectList);
 
+        List<Object[]> objectList1 = orderUseCase.getRankingEmployee(page, size);
+
+        assertEquals(objectList, objectList1);
+    }
+    @Test
+    void getRankingEmployeeRestaurantNotFound() {
+        Long ownerId = 1L;
+        Integer page = 0;
+        Integer size = 10;
+        when(securityContextPort.getIdFromSecurityContext()).thenReturn(ownerId);
+        when(restaurantPersistencePort.findByOwnerId(ownerId)).thenReturn(null);
+
+        assertThrows(DataNotFoundException.class, () -> orderUseCase.getRankingEmployee(page, size));
+        verify(orderPersistencePort, never()).getRankingEmployee(eq(page), eq(size), anyLong(), eq(StatusEnumModel.DELIVERED));
+    }
+    @Test
+    void getRankingEmployeeEmptyList() {
+        Long ownerId = 1L;
+        Integer page = 0;
+        Integer size = 10;
+        when(securityContextPort.getIdFromSecurityContext()).thenReturn(ownerId);
+        RestaurantModel restaurantModel = new RestaurantModel(1L, null, null, null, null, null, null);
+        when(restaurantPersistencePort.findByOwnerId(ownerId)).thenReturn(restaurantModel);
+        when(orderPersistencePort.getRankingEmployee(page, size, restaurantModel.getId(), StatusEnumModel.DELIVERED)).thenReturn(new ArrayList<>());
+
+        assertThrows(DataNotFoundException.class, () -> orderUseCase.getRankingEmployee(page, size));
+    }
 
     private OrderModel createExampleOrderModel(){
         OrderModel orderModel = new OrderModel();
