@@ -14,6 +14,7 @@ import feign.FeignException;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 public class OrderUseCase implements IOrderServicePort {
@@ -143,6 +144,7 @@ public class OrderUseCase implements IOrderServicePort {
         if(!createSecurityPin(orderModel).equals(pin)) throw new DomainException("Order cannot be delivered because the security pin is wrong");
 
         orderModel.setStatus(StatusEnumModel.DELIVERED);
+        orderModel.setDurationMinutes(ChronoUnit.MINUTES.between(orderModel.getCreatedAt(), LocalDateTime.now()));
         orderPersistencePort.save(orderModel);
         trackingOrder(orderModel, StatusEnumModel.READY.name());
     }
@@ -179,6 +181,17 @@ public class OrderUseCase implements IOrderServicePort {
             throw new DomainException(e.getMessage());
         }
         return trackingModelList;
+    }
+
+    @Override
+    public List<OrderModel> getOrderDuration(Integer page, Integer size) {
+        Long ownerId = getIdFromSecurityContext();
+        RestaurantModel restaurantModel = restaurantPersistencePort.findByOwnerId(ownerId);
+        if(restaurantModel == null) throw new DataNotFoundException("Owner does not a restaurant");
+
+        List<OrderModel> orderModelList = orderPersistencePort.getAllOrdersByRestaurantAndStatus(page, size, restaurantModel.getId(), StatusEnumModel.DELIVERED);
+        if(orderModelList.isEmpty()) throw new DataNotFoundException("There are no orders delivered in the restaurant");
+        return orderModelList;
     }
 
     private String createSecurityPin(OrderModel orderModel){

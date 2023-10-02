@@ -37,6 +37,9 @@ public class OrderEntity {
     @JoinColumn(name = "chef_id")
     private RestaurantEmployeeEntity restaurantEmployee;
 
+    @Column(name = "duration_minutes")
+    private Long durationMinutes;
+
     /*@OneToMany(mappedBy = "order") //cascade = CascadeType.ALL para guardar orderdish
     private List<OrderDishEntity> dishes; //mejor no ya que genera stackoverflowexception al guardar y obtener */
 }

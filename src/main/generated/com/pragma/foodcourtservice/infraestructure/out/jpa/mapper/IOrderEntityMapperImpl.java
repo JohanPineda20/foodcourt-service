@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2023-09-29T00:39:48-0500",
+    date = "2023-10-02T10:40:20-0500",
     comments = "version: 1.5.5.Final, compiler: javac, environment: Java 17.0.8.1 (Amazon.com Inc.)"
 )
 @Component
@@ -35,6 +35,7 @@ public class IOrderEntityMapperImpl implements IOrderEntityMapper {
         orderModel.setStatus( statusEnumToStatusEnumModel( orderEntity.getStatus() ) );
         orderModel.setRestaurantEmployee( restaurantEmployeeEntityToRestaurantEmployeeModel( orderEntity.getRestaurantEmployee() ) );
         orderModel.setRestaurant( restaurantEntityToRestaurantModel( orderEntity.getRestaurant() ) );
+        orderModel.setDurationMinutes( orderEntity.getDurationMinutes() );
 
         return orderModel;
     }
@@ -53,6 +54,7 @@ public class IOrderEntityMapperImpl implements IOrderEntityMapper {
         orderEntity.setStatus( mapToStatusEnum( orderModel.getStatus() ) );
         orderEntity.setRestaurant( restaurantModelToRestaurantEntity( orderModel.getRestaurant() ) );
         orderEntity.setRestaurantEmployee( restaurantEmployeeModelToRestaurantEmployeeEntity( orderModel.getRestaurantEmployee() ) );
+        orderEntity.setDurationMinutes( orderModel.getDurationMinutes() );
 
         return orderEntity;
     }

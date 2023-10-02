@@ -17,7 +17,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,10 +46,10 @@ class OrderUseCaseTest {
     OrderModel orderModel = createExampleOrderModel();
     Long customerId = 1L;
     when(securityContextPort.getIdFromSecurityContext()).thenReturn(customerId);
-    when(orderPersistencePort.findByCustomerId(customerId)).thenReturn(List.of(new OrderModel(null, null, null, StatusEnumModel.CANCELLED, null, null, null)));
+    when(orderPersistencePort.findByCustomerId(customerId)).thenReturn(List.of(new OrderModel(null, null, null, StatusEnumModel.CANCELLED, null, null, null, null)));
     when(restaurantPersistencePort.findById(orderModel.getRestaurant().getId())).thenReturn(new RestaurantModel(1L, null, null, null, null, null, null));
     when(dishPersistencePort.findById(1L)).thenReturn(new DishModel(null,null,null,null,null, true, new RestaurantModel(1L, null, null, null, null, null, null), null));
-    when(orderPersistencePort.save(orderModel)).thenReturn(new OrderModel(1L,customerId,null,StatusEnumModel.PENDING,null,null,null));
+    when(orderPersistencePort.save(orderModel)).thenReturn(new OrderModel(1L,customerId,null,StatusEnumModel.PENDING,null,null,null, null));
 
     orderUseCase.save(orderModel);
 
@@ -64,10 +63,10 @@ class OrderUseCaseTest {
         OrderModel orderModel = createExampleOrderModel();
         Long customerId = 1L;
         when(securityContextPort.getIdFromSecurityContext()).thenReturn(customerId);
-        when(orderPersistencePort.findByCustomerId(customerId)).thenReturn(List.of(new OrderModel(null, null, null, StatusEnumModel.CANCELLED, null, null, null)));
+        when(orderPersistencePort.findByCustomerId(customerId)).thenReturn(List.of(new OrderModel(null, null, null, StatusEnumModel.CANCELLED, null, null, null, null)));
         when(restaurantPersistencePort.findById(orderModel.getRestaurant().getId())).thenReturn(new RestaurantModel(1L, null, null, null, null, null, null));
         when(dishPersistencePort.findById(1L)).thenReturn(new DishModel(null, null, null, null, null, true, new RestaurantModel(1L, null, null, null, null, null, null), null));
-        when(orderPersistencePort.save(orderModel)).thenReturn(new OrderModel(1L, customerId, null, StatusEnumModel.PENDING, null, null, null));
+        when(orderPersistencePort.save(orderModel)).thenReturn(new OrderModel(1L, customerId, null, StatusEnumModel.PENDING, null, null, null, null));
         doThrow(FeignException.class).when(trackingFeignClientPort).trackingOrder(any());
 
         assertThrows(DomainException.class, () -> orderUseCase.save(orderModel));
@@ -82,7 +81,7 @@ class OrderUseCaseTest {
         OrderModel orderModel = createExampleOrderModel();
         Long customerId = 1L;
         when(securityContextPort.getIdFromSecurityContext()).thenReturn(customerId);
-        when(orderPersistencePort.findByCustomerId(customerId)).thenReturn(List.of(new OrderModel(null, null, null, StatusEnumModel.PENDING, null, null, null)));
+        when(orderPersistencePort.findByCustomerId(customerId)).thenReturn(List.of(new OrderModel(null, null, null, StatusEnumModel.PENDING, null, null, null,null)));
 
         assertThrows(DomainException.class, () -> orderUseCase.save(orderModel));
 
@@ -97,7 +96,7 @@ class OrderUseCaseTest {
         OrderModel orderModel = createExampleOrderModel();
         Long customerId = 1L;
         when(securityContextPort.getIdFromSecurityContext()).thenReturn(customerId);
-        when(orderPersistencePort.findByCustomerId(customerId)).thenReturn(List.of(new OrderModel(null, null, null, StatusEnumModel.CANCELLED, null, null, null)));
+        when(orderPersistencePort.findByCustomerId(customerId)).thenReturn(List.of(new OrderModel(null, null, null, StatusEnumModel.CANCELLED, null, null, null, null)));
         when(restaurantPersistencePort.findById(orderModel.getRestaurant().getId())).thenReturn(null);
 
         assertThrows(DataNotFoundException.class, () -> orderUseCase.save(orderModel));
@@ -113,7 +112,7 @@ class OrderUseCaseTest {
         OrderModel orderModel = createExampleOrderModel();
         Long customerId = 1L;
         when(securityContextPort.getIdFromSecurityContext()).thenReturn(customerId);
-        when(orderPersistencePort.findByCustomerId(customerId)).thenReturn(List.of(new OrderModel(null, null, null, StatusEnumModel.CANCELLED, null, null, null)));
+        when(orderPersistencePort.findByCustomerId(customerId)).thenReturn(List.of(new OrderModel(null, null, null, StatusEnumModel.CANCELLED, null, null, null, null)));
         when(restaurantPersistencePort.findById(orderModel.getRestaurant().getId())).thenReturn(new RestaurantModel(1L, null, null, null, null, null, null));
         when(dishPersistencePort.findById(1L)).thenReturn(null);
 
@@ -130,7 +129,7 @@ class OrderUseCaseTest {
         OrderModel orderModel = createExampleOrderModel();
         Long customerId = 1L;
         when(securityContextPort.getIdFromSecurityContext()).thenReturn(customerId);
-        when(orderPersistencePort.findByCustomerId(customerId)).thenReturn(List.of(new OrderModel(null, null, null, StatusEnumModel.CANCELLED, null, null, null)));
+        when(orderPersistencePort.findByCustomerId(customerId)).thenReturn(List.of(new OrderModel(null, null, null, StatusEnumModel.CANCELLED, null, null, null, null)));
         when(restaurantPersistencePort.findById(orderModel.getRestaurant().getId())).thenReturn(new RestaurantModel(1L, null, null, null, null, null, null));
         when(dishPersistencePort.findById(1L)).thenReturn(new DishModel(null,null,null,null,null, true, new RestaurantModel(7L, null, null, null, null, null, null), null));
 
@@ -147,7 +146,7 @@ class OrderUseCaseTest {
         OrderModel orderModel = createExampleOrderModel();
         Long customerId = 1L;
         when(securityContextPort.getIdFromSecurityContext()).thenReturn(customerId);
-        when(orderPersistencePort.findByCustomerId(customerId)).thenReturn(List.of(new OrderModel(null, null, null, StatusEnumModel.CANCELLED, null, null, null)));
+        when(orderPersistencePort.findByCustomerId(customerId)).thenReturn(List.of(new OrderModel(null, null, null, StatusEnumModel.CANCELLED, null, null, null, null)));
         when(restaurantPersistencePort.findById(orderModel.getRestaurant().getId())).thenReturn(new RestaurantModel(1L, null, null, null, null, null, null));
         when(dishPersistencePort.findById(1L)).thenReturn(new DishModel(null,null,null,null,null, false, new RestaurantModel(1L, null, null, null, null, null, null), null));
 
@@ -169,7 +168,7 @@ class OrderUseCaseTest {
         RestaurantEmployeeModel restaurantEmployeeModel = new RestaurantEmployeeModel();
         restaurantEmployeeModel.setRestaurant(new RestaurantModel(1L, null, null, null, null, null, null));
         when(restaurantPersistencePort.findRestaurantEmployeeByEmployeeId(employeeId)).thenReturn(restaurantEmployeeModel);
-        List<OrderModel> orderModelList = List.of(new OrderModel(1L, null, null, StatusEnumModel.PENDING, null, null, null));
+        List<OrderModel> orderModelList = List.of(new OrderModel(1L, null, null, StatusEnumModel.PENDING, null, null, null, null));
         when(orderPersistencePort.getAllOrdersByRestaurant(page, size, restaurantEmployeeModel.getRestaurant().getId())).thenReturn(orderModelList);
         when(orderPersistencePort.getAllDishesByOrderId(1L)).thenReturn(List.of(new OrderDishModel()));
         when(orderPersistencePort.getAllOrdersByRestaurantAndStatus(page, size, restaurantEmployeeModel.getRestaurant().getId(), StatusEnumModel.PENDING)).thenReturn(orderModelList);
@@ -190,7 +189,7 @@ class OrderUseCaseTest {
         RestaurantEmployeeModel restaurantEmployeeModel = new RestaurantEmployeeModel();
         restaurantEmployeeModel.setRestaurant(new RestaurantModel(1L, null, null, null, null, null, null));
         when(restaurantPersistencePort.findRestaurantEmployeeByEmployeeId(employeeId)).thenReturn(restaurantEmployeeModel);
-        List<OrderModel> orderModelList = List.of(new OrderModel(1L, null, null, StatusEnumModel.CANCELLED, null, null, null));
+        List<OrderModel> orderModelList = List.of(new OrderModel(1L, null, null, StatusEnumModel.CANCELLED, null, null, null, null));
         when(orderPersistencePort.getAllOrdersByRestaurant(page, size, restaurantEmployeeModel.getRestaurant().getId())).thenReturn(orderModelList);
         when(orderPersistencePort.getAllDishesByOrderId(1L)).thenReturn(List.of(new OrderDishModel()));
         when(orderPersistencePort.getAllOrdersByRestaurantAndStatus(page, size, restaurantEmployeeModel.getRestaurant().getId(), StatusEnumModel.PENDING)).thenReturn(new ArrayList<>());
@@ -208,7 +207,7 @@ class OrderUseCaseTest {
         RestaurantEmployeeModel restaurantEmployeeModel = new RestaurantEmployeeModel();
         restaurantEmployeeModel.setRestaurant(new RestaurantModel(1L, null, null, null, null, null, null));
         when(restaurantPersistencePort.findRestaurantEmployeeByEmployeeId(employeeId)).thenReturn(restaurantEmployeeModel);
-        List<OrderModel> orderModelList = List.of(new OrderModel(1L, null, null, StatusEnumModel.CANCELLED, null, null, null));
+        List<OrderModel> orderModelList = List.of(new OrderModel(1L, null, null, StatusEnumModel.CANCELLED, null, null, null, null));
         when(orderPersistencePort.getAllOrdersByRestaurant(page, size, restaurantEmployeeModel.getRestaurant().getId())).thenReturn(orderModelList);
         when(orderPersistencePort.getAllDishesByOrderId(1L)).thenReturn(List.of(new OrderDishModel()));
 
@@ -379,6 +378,7 @@ class OrderUseCaseTest {
 
         verify(orderPersistencePort, times(1)).save(orderModel);
         assertEquals(StatusEnumModel.DELIVERED, orderModel.getStatus());
+        assertNotNull(orderModel.getDurationMinutes());
     }
     @Test
     void cancelOrder(){
@@ -478,6 +478,45 @@ class OrderUseCaseTest {
         when(trackingFeignClientPort.getHistoryOrder(orderId)).thenThrow(FeignException.class);
 
         assertThrows(DomainException.class, () -> orderUseCase.getHistoryOrder(orderId));
+    }
+    @Test
+    void getOrderDuration() {
+        Long ownerId = 1L;
+        Integer page = 0;
+        Integer size = 10;
+        when(securityContextPort.getIdFromSecurityContext()).thenReturn(ownerId);
+        RestaurantModel restaurantModel = new RestaurantModel(1L, null, null, null, null, null, null);
+        when(restaurantPersistencePort.findByOwnerId(ownerId)).thenReturn(restaurantModel);
+        List<OrderModel> orderModelList = List.of(new OrderModel());
+        when(orderPersistencePort.getAllOrdersByRestaurantAndStatus(page, size, restaurantModel.getId(), StatusEnumModel.DELIVERED)).thenReturn(orderModelList);
+
+        List<OrderModel> orderModelList1 = orderUseCase.getOrderDuration(page, size);
+
+        assertEquals(orderModelList, orderModelList1);
+    }
+    @Test
+    void getOrderDurationRestaurantNotFound() {
+        Long ownerId = 1L;
+        Integer page = 0;
+        Integer size = 10;
+        when(securityContextPort.getIdFromSecurityContext()).thenReturn(ownerId);
+        when(restaurantPersistencePort.findByOwnerId(ownerId)).thenReturn(null);
+
+        assertThrows(DataNotFoundException.class, () -> orderUseCase.getOrderDuration(page, size));
+        verify(orderPersistencePort, never()).getAllOrdersByRestaurantAndStatus(eq(page), eq(size), anyLong(), eq(StatusEnumModel.DELIVERED));
+    }
+
+    @Test
+    void getOrderDurationEmptyList() {
+        Long ownerId = 1L;
+        Integer page = 0;
+        Integer size = 10;
+        when(securityContextPort.getIdFromSecurityContext()).thenReturn(ownerId);
+        RestaurantModel restaurantModel = new RestaurantModel(1L, null, null, null, null, null, null);
+        when(restaurantPersistencePort.findByOwnerId(ownerId)).thenReturn(restaurantModel);
+        when(orderPersistencePort.getAllOrdersByRestaurantAndStatus(page, size, restaurantModel.getId(), StatusEnumModel.DELIVERED)).thenReturn(new ArrayList<>());
+
+        assertThrows(DataNotFoundException.class, () -> orderUseCase.getOrderDuration(page, size));
     }
 
 

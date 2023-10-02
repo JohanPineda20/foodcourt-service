@@ -3,6 +3,7 @@ package com.pragma.foodcourtservice.application.mapper;
 import com.pragma.foodcourtservice.application.dto.request.OrderDishRequest;
 import com.pragma.foodcourtservice.application.dto.request.OrderRequest;
 import com.pragma.foodcourtservice.application.dto.response.OrderDishResponse;
+import com.pragma.foodcourtservice.application.dto.response.OrderDurationResponse;
 import com.pragma.foodcourtservice.application.dto.response.OrderResponse;
 import com.pragma.foodcourtservice.application.dto.response.TrackingResponse;
 import com.pragma.foodcourtservice.domain.model.CategoryModel;
@@ -22,7 +23,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2023-09-29T00:39:48-0500",
+    date = "2023-10-02T10:40:20-0500",
     comments = "version: 1.5.5.Final, compiler: javac, environment: Java 17.0.8.1 (Amazon.com Inc.)"
 )
 @Component
@@ -127,6 +128,20 @@ public class IOrderDtoMapperImpl implements IOrderDtoMapper {
         List<TrackingResponse> list = new ArrayList<TrackingResponse>( trackingModelList.size() );
         for ( TrackingModel trackingModel : trackingModelList ) {
             list.add( trackingModelToTrackingResponse( trackingModel ) );
+        }
+
+        return list;
+    }
+
+    @Override
+    public List<OrderDurationResponse> mapToOrderDurationResponseList(List<OrderModel> orderModelList) {
+        if ( orderModelList == null ) {
+            return null;
+        }
+
+        List<OrderDurationResponse> list = new ArrayList<OrderDurationResponse>( orderModelList.size() );
+        for ( OrderModel orderModel : orderModelList ) {
+            list.add( orderModelToOrderDurationResponse( orderModel ) );
         }
 
         return list;
@@ -287,5 +302,23 @@ public class IOrderDtoMapperImpl implements IOrderDtoMapper {
         TrackingResponse trackingResponse = new TrackingResponse( orderId, customerId, customerEmail, datetime, statusPrevious, status, employeeId, employeeEmail );
 
         return trackingResponse;
+    }
+
+    protected OrderDurationResponse orderModelToOrderDurationResponse(OrderModel orderModel) {
+        if ( orderModel == null ) {
+            return null;
+        }
+
+        Long id = null;
+        LocalDateTime createdAt = null;
+        Long durationMinutes = null;
+
+        id = orderModel.getId();
+        createdAt = orderModel.getCreatedAt();
+        durationMinutes = orderModel.getDurationMinutes();
+
+        OrderDurationResponse orderDurationResponse = new OrderDurationResponse( id, createdAt, durationMinutes );
+
+        return orderDurationResponse;
     }
 }

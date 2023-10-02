@@ -11,10 +11,11 @@ public class OrderModel {
     private RestaurantEmployeeModel restaurantEmployee;
     private RestaurantModel restaurant;
     private List<OrderDishModel> dishes;
+    private Long durationMinutes;
 
     public OrderModel() {
     }
-    public OrderModel(Long id, Long customerId, LocalDateTime createdAt, StatusEnumModel status, RestaurantEmployeeModel restaurantEmployee, RestaurantModel restaurant, List<OrderDishModel> dishes) {
+    public OrderModel(Long id, Long customerId, LocalDateTime createdAt, StatusEnumModel status, RestaurantEmployeeModel restaurantEmployee, RestaurantModel restaurant, List<OrderDishModel> dishes, Long durationMinutes) {
         this.id = id;
         this.customerId = customerId;
         this.createdAt = createdAt;
@@ -22,6 +23,7 @@ public class OrderModel {
         this.restaurantEmployee = restaurantEmployee;
         this.restaurant = restaurant;
         this.dishes = dishes;
+        this.durationMinutes = durationMinutes;
     }
     public Long getId() {
         return id;
@@ -77,5 +79,11 @@ public class OrderModel {
 
     public void setDishes(List<OrderDishModel> dishes) {
         this.dishes = dishes;
+    }
+    public Long getDurationMinutes() {
+        return durationMinutes;
+    }
+    public void setDurationMinutes(Long durationMinutes) {
+        this.durationMinutes = durationMinutes;
     }
 }

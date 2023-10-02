@@ -11,8 +11,6 @@ import java.util.List;
         unmappedSourcePolicy = ReportingPolicy.IGNORE,
         unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface ITrackingFeignDtoMapper {
-
     TrackingFeignDto mapToTrackingFeignDto(TrackingModel trackingModel);
     List<TrackingModel> mapToTrackingModelList(List<TrackingFeignDto> trackingFeignDtoList);
-
 }

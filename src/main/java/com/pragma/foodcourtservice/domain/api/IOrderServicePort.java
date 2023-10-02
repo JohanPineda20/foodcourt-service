@@ -13,4 +13,5 @@ public interface IOrderServicePort {
     void deliverOrder(Long id, String pin);
     void cancelOrder(Long id);
     List<TrackingModel> getHistoryOrder(Long id);
+    List<OrderModel> getOrderDuration(Integer page, Integer size);
 }
